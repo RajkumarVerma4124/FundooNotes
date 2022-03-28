@@ -37,7 +37,7 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Login User Data
-        public UserEntity Login(UserLogin userLogin)
+        public LoginResponse Login(UserLogin userLogin)
         {
             try
             {

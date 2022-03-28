@@ -1,10 +1,13 @@
 ﻿using CommonLayer.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
 using System;
-using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 
 namespace RepositoryLayer.Service
@@ -17,10 +20,16 @@ namespace RepositoryLayer.Service
         //Reference Object For FundooContext
         private readonly FundooContext fundooContext;
 
+        //Reference Object For configuration
+        private readonly IConfiguration configuration;
+
+        private static string Key = "47c53aa7571c33d2f98d02a4313c4ba1ea15e45c18794eb564b21c19591805ff";
+
         //Created Constructor To Initialize Fundoocontext For Each Instance
-        public UserRL(FundooContext fundooContext)
+        public UserRL(FundooContext fundooContext, IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
+            this.configuration = configuration; 
         }
 
         //Method to register user with new user data into the db table
@@ -36,7 +45,7 @@ namespace RepositoryLayer.Service
                     userEntity.FirstName = userReg.FirstName;
                     userEntity.LastName = userReg.LastName;
                     userEntity.EmailId = userReg.EmailId;
-                    userEntity.Password = userReg.Password;
+                    userEntity.Password = PasswordEncrypt(userReg.Password);
                     fundooContext.Add(userEntity);
                     int res = fundooContext.SaveChanges();
                     if (res > 0)
@@ -55,17 +64,30 @@ namespace RepositoryLayer.Service
         }
 
         //Method to login user by checking existing db table with user credentials
-        public UserEntity Login(UserLogin userLogin)
+        public LoginResponse Login(UserLogin userLogin)
         {
             try
             {
+                LoginResponse loginResponse = new LoginResponse();
                 //Checking If The EmailId Or PassWord Is Null
                 if (string.IsNullOrEmpty(userLogin.EmailId) || string.IsNullOrEmpty(userLogin.Password))
                     return null;
                 else {
-                    //Checking the tb with given user email id and password if its exist or not
-                    var userData = fundooContext.UserData.Where(x => x.EmailId == userLogin.EmailId && x.Password == userLogin.Password).FirstOrDefault();
-                    return userData;
+                    //Checking the tbl with given user email id if its exist or not
+                    loginResponse.UserData = fundooContext.UserData.Where(x => x.EmailId == userLogin.EmailId).FirstOrDefault();
+                    if (loginResponse.UserData != null)
+                    {
+                        string decryptPass = PasswordDecrypt(loginResponse.UserData.Password);
+                        if (decryptPass == userLogin.Password)
+                        {
+                            loginResponse.Token = this.GenerateSecurityToken(loginResponse.UserData.EmailId, loginResponse.UserData.UserId);
+                            return loginResponse;
+                        }
+                        else
+                            return null;
+                    }
+                    else
+                        return null;
                 }      
             }
             catch (Exception ex)
@@ -73,5 +95,71 @@ namespace RepositoryLayer.Service
                 throw ex;
             }
         }
+
+        //Method To Encrypt The Password To Store Into The DB
+        public static string PasswordEncrypt(string password)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(password))
+                    return null;
+                else
+                {
+                    password += Key;
+                    var passwordBytes = Encoding.UTF8.GetBytes(password);
+                    return Convert.ToBase64String(passwordBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Decrypt The Password From The DB
+        public static string PasswordDecrypt(string encodedPassword)
+        {
+            try
+            {
+                //Decrypting the password
+                if (string.IsNullOrEmpty(encodedPassword))
+                    return null;
+                else
+                {
+                    var encodedBytes = Convert.FromBase64String(encodedPassword);
+                    var res = Encoding.UTF8.GetString(encodedBytes);
+                    var resPass = res.Substring(0, res.Length - Key.Length);
+                    return resPass;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Generate Security Token For A User
+        private string GenerateSecurityToken(string emailId, long userId)
+        {
+            //Genearting A Json Web Toekn For Authorization
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Jwt:SecretKey"]));
+
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Email, emailId),
+                new Claim("UserId", userId.ToString())
+            };
+            var token = new JwtSecurityToken(
+              this.configuration["Jwt:Issuer"],
+              this.configuration["Jwt:Audience"],
+              claims,
+              expires: DateTime.Now.AddHours(1),
+              signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
     }
 }
