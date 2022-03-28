@@ -6,12 +6,17 @@ using System.Text;
 
 namespace RepositoryLayer.Context
 {
+    /// <summary>
+    /// Created The Context Class For Migration Of DIfferent Tables Into Db
+    /// </summary>
     public class FundooContext: DbContext
     {
-        public FundooContext(DbContextOptions options)
-           : base(options)
+        /// Initializes the constructor for fundoocontext class
+        public FundooContext(DbContextOptions options) : base(options)
         {
         }
+
+        /// Property For UserData Table To Create Table Using UserEntity Properties
         public DbSet<UserEntity> UserData { get; set; }
     }
 }

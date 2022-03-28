@@ -5,12 +5,10 @@ using System.Text;
 namespace CommonLayer.Models
 {
     /// <summary>
-    /// Created The Class For User Reg Request
+    /// Created The Class For User Login Request
     /// </summary>
-    public class UserReg
+    public class UserLogin
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
         public string EmailId { get; set; }
         public string Password { get; set; }
     }

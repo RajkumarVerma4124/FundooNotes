@@ -6,8 +6,12 @@ using System.Text;
 
 namespace RepositoryLayer.Interface
 {
+    /// <summary>
+    /// Created The User Interface For User Repository Layer Class
+    /// </summary>
     public interface IUserRL
     {
         UserEntity Register(UserReg userReg);
+        UserEntity Login(UserLogin userLogin);
     }
 }
