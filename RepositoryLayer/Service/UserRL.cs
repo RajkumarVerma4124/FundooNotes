@@ -80,7 +80,7 @@ namespace RepositoryLayer.Service
                         string decryptPass = PasswordDecrypt(loginResponse.UserData.Password);
                         if (decryptPass == userLogin.Password)
                         {
-                            loginResponse.Token = this.GenerateSecurityToken(loginResponse.UserData.EmailId, loginResponse.UserData.UserId);
+                            loginResponse.Token = GenerateSecurityToken(loginResponse.UserData.EmailId, loginResponse.UserData.UserId);
                             return loginResponse;
                         }
                         else
@@ -96,13 +96,57 @@ namespace RepositoryLayer.Service
             }
         }
 
+        //Method To Send Token To The Registered Emailid For The User Who Forgots The Password
+        public string ForgetPassword(string emailId)
+        {
+            try
+            {
+                var userDetails = fundooContext.UserData.Where(x => x.EmailId == emailId).FirstOrDefault();
+                if (userDetails != null)
+                {
+                    var token = GenerateSecurityToken(userDetails.EmailId, userDetails.UserId);
+                    new Msmq().SendMessage(token);
+                    return token;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Reset The Password For Autheniticated EmailId After Token AUthorization 
+        public string ResetPassword(ResetPassword resetPassword, string emailId)
+        {
+            try
+            {
+                if (resetPassword.NewPassword.Equals(resetPassword.ConfirmPassword))
+                {
+                    var userDetails = fundooContext.UserData.Where(x => x.EmailId == emailId).FirstOrDefault();
+                    userDetails.Password = PasswordEncrypt(resetPassword.ConfirmPassword);
+                    fundooContext.SaveChanges();
+                    return "Resetted The Password SuccessFully";
+                }
+                else
+                {
+                    return "Password Resetting Was Unsuccessfull";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         //Method To Encrypt The Password To Store Into The DB
         public static string PasswordEncrypt(string password)
         {
             try
             {
                 if (string.IsNullOrEmpty(password))
-                    return null;
+                    return null;    
                 else
                 {
                     password += Key;
@@ -142,23 +186,30 @@ namespace RepositoryLayer.Service
         //Method To Generate Security Token For A User
         private string GenerateSecurityToken(string emailId, long userId)
         {
-            //Genearting A Json Web Toekn For Authorization
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Jwt:SecretKey"]));
-
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+            try
             {
+                //Genearting A Json Web Toekn For Authorization
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Jwt:SecretKey"]));
+
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                var claims = new[]
+                {
                 new Claim(ClaimTypes.Email, emailId),
                 new Claim("UserId", userId.ToString())
-            };
-            var token = new JwtSecurityToken(
-              this.configuration["Jwt:Issuer"],
-              this.configuration["Jwt:Audience"],
-              claims,
-              expires: DateTime.Now.AddHours(1),
-              signingCredentials: credentials);
+                };
+                var token = new JwtSecurityToken(
+                  this.configuration["Jwt:Issuer"],
+                  this.configuration["Jwt:Audience"],
+                  claims,
+                  expires: DateTime.Now.AddHours(1),
+                  signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
     }

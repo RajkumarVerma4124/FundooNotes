@@ -48,5 +48,31 @@ namespace BusinessLayer.Service
                 throw ex;
             }
         }
+
+        //Method To Call And Return Forget Password 
+        public string ForgetPassword(string emailId)
+        {
+            try
+            {
+                return this.userRL.ForgetPassword(emailId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Call And Return Reset Password For Authorized User 
+        public string ResetPassword(ResetPassword resetPassword, string emailId)
+        {
+            try
+            {
+                return this.userRL.ResetPassword(resetPassword, emailId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

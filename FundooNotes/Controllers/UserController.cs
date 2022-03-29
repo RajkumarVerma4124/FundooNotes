@@ -3,11 +3,13 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FundooNotes.Controllers
 {
     /// <summary>
-    /// Created The User Controller For Http Requests And Response 
+    /// Created The User Controller For Http Requests And Response 👈 
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
@@ -48,9 +50,47 @@ namespace FundooNotes.Controllers
             {
                 var resUser = userBL.Login(userLogin);
                 if (resUser != null)
-                    return Ok(new { success = true, message = "Login Successfully", data = resUser});
+                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.UserData.EmailId,  token = resUser.Token});
                 else
                     return BadRequest(new { success = false, message = "Login Failed Check EmailId And Password" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Post Request For Forgot Password Existing User (POST: /api/user/forgotpassword)
+        [HttpPost("ForgotPassword")]
+        public IActionResult ForgotPassword(string emailId)
+        {
+            try
+            {
+                var resUser = userBL.ForgetPassword(emailId);
+                if (resUser != null)
+                    return Ok(new { success = true, message = "Reset Link Sent Successfully" });
+                else
+                    return BadRequest(new { success = false, message = "Unsuccessfull" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Put Request For Resetting Password For Existing User (PUT: /api/user/resetpassword)
+        [HttpPut("ResetPassword")]
+        [Authorize]  //👈 For Authorized User Only
+        public IActionResult ResetPassword(ResetPassword resetPassword)
+        {
+            try
+            {
+                var emailId = User.FindFirst(ClaimTypes.Email).Value;
+                var resMessage = userBL.ResetPassword(resetPassword, emailId);
+                if (resMessage != null)
+                    return Ok(new { success = true, message = resMessage });
+                else
+                    return BadRequest(new { success = false, message = resMessage });
             }
             catch (Exception ex)
             {
