@@ -14,10 +14,12 @@ namespace CommonLayer.Models
     {
         //Created The Object Reference For MessageQueue
         MessageQueue messageQueue = new MessageQueue();
+        private string recieverEmailAddr;
 
         //Method To Send Token Using MessageQueue And Delegate
-        public void SendMessage(string token)
+        public void SendMessage(string token,string emailId)
         {
+            recieverEmailAddr = emailId;
             messageQueue.Path = @".\Private$\Token";
             try
             {
@@ -52,7 +54,7 @@ namespace CommonLayer.Models
                     Credentials = new NetworkCredential("iamrajvermapro@gmail.com", "QwertyKey@123"),
                 };
                 mailMessage.From = new MailAddress("iamrajvermapro@gmail.com");
-                mailMessage.To.Add(new MailAddress("iamrajvermapro@gmail.com"));
+                mailMessage.To.Add(new MailAddress(recieverEmailAddr));
                 mailMessage.Body = token;
                 mailMessage.Subject = "Fundoo Notes Password Reset Link";
                 smtpClient.Send(mailMessage);

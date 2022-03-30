@@ -18,5 +18,6 @@ namespace RepositoryLayer.Context
 
         /// Property For UserData Table To Create Table Using UserEntity Properties
         public DbSet<UserEntity> UserData { get; set; }
+        public DbSet<NoteEntity> NotesData { get; set; }
     }
 }

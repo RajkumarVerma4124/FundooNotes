@@ -29,7 +29,7 @@ namespace RepositoryLayer.Service
         public UserRL(FundooContext fundooContext, IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
-            this.configuration = configuration; 
+            this.configuration = configuration;
         }
 
         //Method to register user with new user data into the db table
@@ -55,7 +55,7 @@ namespace RepositoryLayer.Service
                 }
                 else
                     return null;
-                
+
             }
             catch (Exception ex)
             {
@@ -72,7 +72,8 @@ namespace RepositoryLayer.Service
                 //Checking If The EmailId Or PassWord Is Null
                 if (string.IsNullOrEmpty(userLogin.EmailId) || string.IsNullOrEmpty(userLogin.Password))
                     return null;
-                else {
+                else
+                {
                     //Checking the tbl with given user email id if its exist or not
                     loginResponse.UserData = fundooContext.UserData.Where(x => x.EmailId == userLogin.EmailId).FirstOrDefault();
                     if (loginResponse.UserData != null)
@@ -88,7 +89,7 @@ namespace RepositoryLayer.Service
                     }
                     else
                         return null;
-                }      
+                }
             }
             catch (Exception ex)
             {
@@ -105,7 +106,7 @@ namespace RepositoryLayer.Service
                 if (userDetails != null)
                 {
                     var token = GenerateSecurityToken(userDetails.EmailId, userDetails.UserId);
-                    new Msmq().SendMessage(token);
+                    new Msmq().SendMessage(token, userDetails.EmailId);
                     return token;
                 }
                 else
@@ -131,7 +132,7 @@ namespace RepositoryLayer.Service
                 }
                 else
                 {
-                    return "Password Resetting Was Unsuccessfull";
+                    return "Password Does Not Match";
                 }
             }
             catch (Exception ex)
@@ -146,7 +147,7 @@ namespace RepositoryLayer.Service
             try
             {
                 if (string.IsNullOrEmpty(password))
-                    return null;    
+                    return null;
                 else
                 {
                     password += Key;
@@ -198,8 +199,8 @@ namespace RepositoryLayer.Service
                 new Claim("UserId", userId.ToString())
                 };
                 var token = new JwtSecurityToken(
-                  this.configuration["Jwt:Issuer"],
-                  this.configuration["Jwt:Audience"],
+                  issuer: this.configuration["Jwt:Issuer"],
+                  audience: this.configuration["Jwt:Audience"],
                   claims,
                   expires: DateTime.Now.AddHours(1),
                   signingCredentials: credentials);

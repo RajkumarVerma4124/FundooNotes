@@ -1,6 +1,5 @@
 ﻿using BusinessLayer.Interface;
 using CommonLayer.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using Microsoft.AspNetCore.Authorization;
@@ -87,7 +86,7 @@ namespace FundooNotes.Controllers
             {
                 var emailId = User.FindFirst(ClaimTypes.Email).Value;
                 var resMessage = userBL.ResetPassword(resetPassword, emailId);
-                if (resMessage != null)
+                if (!resMessage.Contains("Not"))
                     return Ok(new { success = true, message = resMessage });
                 else
                     return BadRequest(new { success = false, message = resMessage });
