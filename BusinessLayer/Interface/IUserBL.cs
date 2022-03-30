@@ -7,7 +7,7 @@ using System.Text;
 namespace BusinessLayer.Interface
 {
     /// <summary>
-    /// Created The Interface For Business Layer Class
+    /// Created The Interface For User Business Layer Class
     /// </summary>
     public interface IUserBL
     {

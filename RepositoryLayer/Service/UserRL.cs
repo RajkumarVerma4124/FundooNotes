@@ -75,7 +75,7 @@ namespace RepositoryLayer.Service
                 else
                 {
                     //Checking the tbl with given user email id if its exist or not
-                    loginResponse.UserData = fundooContext.UserData.Where(x => x.EmailId == userLogin.EmailId).FirstOrDefault();
+                    loginResponse.UserData = fundooContext.UserData.Where(u => u.EmailId == userLogin.EmailId).FirstOrDefault();
                     if (loginResponse.UserData != null)
                     {
                         string decryptPass = PasswordDecrypt(loginResponse.UserData.Password);
@@ -102,7 +102,7 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var userDetails = fundooContext.UserData.Where(x => x.EmailId == emailId).FirstOrDefault();
+                var userDetails = fundooContext.UserData.Where(u => u.EmailId == emailId).FirstOrDefault();
                 if (userDetails != null)
                 {
                     var token = GenerateSecurityToken(userDetails.EmailId, userDetails.UserId);
@@ -125,7 +125,7 @@ namespace RepositoryLayer.Service
             {
                 if (resetPassword.NewPassword.Equals(resetPassword.ConfirmPassword))
                 {
-                    var userDetails = fundooContext.UserData.Where(x => x.EmailId == emailId).FirstOrDefault();
+                    var userDetails = fundooContext.UserData.Where(u => u.EmailId == emailId).FirstOrDefault();
                     userDetails.Password = PasswordEncrypt(resetPassword.ConfirmPassword);
                     fundooContext.SaveChanges();
                     return "Resetted The Password SuccessFully";
@@ -176,7 +176,6 @@ namespace RepositoryLayer.Service
                     var resPass = res.Substring(0, res.Length - Key.Length);
                     return resPass;
                 }
-
             }
             catch (Exception ex)
             {
@@ -191,7 +190,6 @@ namespace RepositoryLayer.Service
             {
                 //Genearting A Json Web Toekn For Authorization
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Jwt:SecretKey"]));
-
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new[]
                 {
@@ -212,6 +210,5 @@ namespace RepositoryLayer.Service
                 throw ex;
             }
         }
-
     }
 }

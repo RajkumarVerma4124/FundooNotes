@@ -84,6 +84,7 @@ namespace FundooNotes.Controllers
         {
             try
             {
+                //Getting THe Email Of Authorized User Using Claims Of Jwt
                 var emailId = User.FindFirst(ClaimTypes.Email).Value;
                 var resMessage = userBL.ResetPassword(resetPassword, emailId);
                 if (!resMessage.Contains("Not"))
