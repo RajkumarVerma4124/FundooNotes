@@ -55,7 +55,7 @@ namespace CommonLayer.Models
                 };
                 mailMessage.From = new MailAddress("iamrajvermapro@gmail.com");
                 mailMessage.To.Add(new MailAddress(recieverEmailAddr));
-                mailMessage.Body = token;
+                mailMessage.Body = "For Password Changed The Below Token Is Provided \nPlease Copy And Paste In Authorize Box In Swagger :- \n"+token;
                 mailMessage.Subject = "Fundoo Notes Password Reset Link";
                 smtpClient.Send(mailMessage);
             }

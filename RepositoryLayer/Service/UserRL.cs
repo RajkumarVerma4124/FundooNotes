@@ -46,7 +46,7 @@ namespace RepositoryLayer.Service
                     userEntity.LastName = userReg.LastName;
                     userEntity.EmailId = userReg.EmailId;
                     userEntity.Password = PasswordEncrypt(userReg.Password);
-                    fundooContext.Add(userEntity);
+                    fundooContext.UserData.Add(userEntity);
                     int res = fundooContext.SaveChanges();
                     if (res > 0)
                         return userEntity;
@@ -200,8 +200,9 @@ namespace RepositoryLayer.Service
                   issuer: this.configuration["Jwt:Issuer"],
                   audience: this.configuration["Jwt:Audience"],
                   claims,
-                  expires: DateTime.Now.AddHours(1),
-                  signingCredentials: credentials);
+                  expires: DateTime.Now.AddMinutes(1),
+                  signingCredentials: credentials
+                );
 
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }

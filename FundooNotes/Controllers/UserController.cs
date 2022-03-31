@@ -77,8 +77,8 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Put Request For Resetting Password For Existing User (PUT: /api/user/resetpassword)
-        [HttpPut("ResetPassword")]
+        //Patch Request For Resetting Password For Existing User (PUT: /api/user/resetpassword)
+        [HttpPatch("ResetPassword")]
         [Authorize]  //👈 For Authorized User Only
         public IActionResult ResetPassword(ResetPassword resetPassword)
         {

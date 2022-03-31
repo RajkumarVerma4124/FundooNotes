@@ -13,8 +13,8 @@ namespace CommonLayer.Models
         public string NewPassword { get; set; }
 
         //Checking The Pattern For Password And Giving Required Annotations For Confirm Password Property
-        [Required(ErrorMessage = "{0} should not be empty")]
         [RegularExpression(@"(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W]).{8,}$", ErrorMessage = "Confirm Passsword is not valid")]
+        [Compare(nameof(NewPassword), ErrorMessage = "Passwords don't match.")]
         public string ConfirmPassword { get; set; }
     }
 }

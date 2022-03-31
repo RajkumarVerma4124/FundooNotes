@@ -46,13 +46,13 @@ namespace FundooNotes.Controllers
         }
 
         //Get Request For Retreiving A Single Note For Particular User Id (GET: /api/notes/getnote)
-        [HttpGet("{Id}/GetNote")]
+        [HttpGet("GetNote/notesId")]
         public IActionResult GetNote(long notesId)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
-                long userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = this.notesBL.GetNote(notesId, userId);
                 if (resNote != null)
                     return this.Ok(new { success = true, message = "Got The Note Successfully", data = resNote });

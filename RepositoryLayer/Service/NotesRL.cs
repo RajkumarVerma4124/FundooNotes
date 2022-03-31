@@ -5,6 +5,7 @@ using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -18,14 +19,10 @@ namespace RepositoryLayer.Service
         //Reference Object For FundooContext
         private readonly FundooContext fundooContext;
 
-        //Reference Object For configuration
-        private readonly IConfiguration configuration;
-
         //Created Constructor To Initialize Fundoocontext For Each Instance
-        public NotesRL(FundooContext fundooContext, IConfiguration configuration)
+        public NotesRL(FundooContext fundooContext)
         {
             this.fundooContext = fundooContext;
-            this.configuration = configuration;
         }
 
         //Method To Create Note With New Notes Data And Userid Into The Db Table
@@ -47,7 +44,7 @@ namespace RepositoryLayer.Service
                     notesEntity.CreatedAt = DateTime.Now;
                     notesEntity.ModifiedAt = DateTime.Now;
                     notesEntity.UserId = userId;
-                    fundooContext.Add(notesEntity);
+                    fundooContext.NotesData.Add(notesEntity);
                     //Adding The Data And Saving The Changes In Database
                     int res = fundooContext.SaveChanges();
                     if (res > 0)
@@ -145,7 +142,7 @@ namespace RepositoryLayer.Service
 
                     // Updating And Saving The Changes In The Database For Given NoteId.
                     fundooContext.NotesData.Update(resNote);
-                    this.fundooContext.SaveChanges();
+                    fundooContext.SaveChanges();
                     return resNote;
                 }
                 else
@@ -167,7 +164,7 @@ namespace RepositoryLayer.Service
                 {
                     // Deleting And Saving The Changes In The Database For Given NoteId.
                     fundooContext.NotesData.Remove(resNote);
-                    this.fundooContext.SaveChanges();
+                    fundooContext.SaveChanges();
                     return "Deleted The Note Successfully";
                 }
                 else

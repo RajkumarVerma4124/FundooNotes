@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace RepositoryLayer.Entity
 {
+    /// <summary>
+    /// Created The Class For Notes Entity
+    /// </summary>
     public class NoteEntity
     {
         [Key]
