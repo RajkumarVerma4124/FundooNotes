@@ -69,7 +69,6 @@ namespace FundooNotes
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FundooNotes", Version = "v1" });
-                
                 //For Authorization
                 var securitySchema = new OpenApiSecurityScheme
                 {
@@ -84,9 +83,7 @@ namespace FundooNotes
                         Id = "Bearer"
                     }
                 };
-
                 c.AddSecurityDefinition("Bearer", securitySchema);
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     { securitySchema, new[] { "Bearer" } }
@@ -103,12 +100,10 @@ namespace FundooNotes
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FundooNotes v1"));
             }
-
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
