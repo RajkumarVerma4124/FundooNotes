@@ -62,39 +62,27 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Single Note Details By Giving Note And User Ids
-        public NoteEntity GetNote(long noteId, long userId)
+        public GetNotes GetNote(long noteId, long userId)
         {
             try
             {
-                if (!userId.Equals(null))
+                var resultNote = fundooContext.NotesData.Where(n => n.UserId == userId && n.NoteId == noteId).FirstOrDefault();
+                if (resultNote != null)
                 {
-                    var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
-                    if (resNote != null)
-                        return resNote;
-                    else
-                        return null;
-                }
-                else
-                    return null;                  
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        //Method To Fetch Multiple Notes Details By User Ids
-        public List<NoteEntity> GetAllNotesByUserId(long userId)
-        {
-            try
-            {
-                if (!userId.Equals(null))
-                {
-                    var resNote = fundooContext.NotesData.Where(n => n.UserId == userId).ToList();
-                    if (resNote != null)
-                        return resNote;
-                    else
-                        return null;
+                    GetNotes resNote = new GetNotes();
+                    resNote.NotesId = resultNote.NoteId;
+                    resNote.Title = resultNote.Title;
+                    resNote.Description = resultNote.Description;
+                    resNote.Color = resultNote.Color;
+                    resNote.Image = resultNote.Image;
+                    resNote.IsArchive = resultNote.IsArchive;
+                    resNote.IsTrash = resultNote.IsArchive;
+                    resNote.IsPinned = resultNote.IsPinned;
+                    resNote.Description = resultNote.Description;
+                    resNote.Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt");
+                    resNote.CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                    resNote.ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                    return resNote;
                 }
                 else
                     return null;
@@ -105,14 +93,71 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch Multiple Notes Details From DB
-        public List<NoteEntity> GetAllNotes()
+        //Method To Fetch Multiple Notes Details By User Ids
+        public IList<GetNotes> GetAllNotesByUserId(long userId)
         {
             try
             {
-                var resNote = fundooContext.NotesData.ToList();
-                if (resNote != null)
-                    return resNote;
+                IList<GetNotes> noteList = new List<GetNotes>();
+                var resNotesList = fundooContext.NotesData.Where(n => n.UserId == userId).ToList();
+                if (resNotesList.Count() > 0) 
+                { 
+                    foreach (var notes in resNotesList)
+                    {
+                        GetNotes resNote = new GetNotes();
+                        resNote.NotesId = notes.NoteId;
+                        resNote.Title = notes.Title;
+                        resNote.Description = notes.Description;
+                        resNote.Color = notes.Color;
+                        resNote.Image = notes.Image;
+                        resNote.IsArchive = notes.IsArchive;
+                        resNote.IsTrash = notes.IsArchive;
+                        resNote.IsPinned = notes.IsPinned;
+                        resNote.Description = notes.Description;
+                        resNote.Reminder = notes.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt");
+                        resNote.CreatedAt = notes.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                        resNote.ModifiedAt = notes.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                        noteList.Add(resNote);
+                    }
+                    return noteList; 
+                }
+                else
+                    return null;
+            }    
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch Multiple Notes Details From DB
+        public IList<GetNotes> GetAllNotes()
+        {
+            try
+            {
+                IList<GetNotes> noteList = new List<GetNotes>();
+                var resNotesList = fundooContext.NotesData.ToList();
+                if (resNotesList.Count() > 0)
+                {
+                    foreach (var notes in resNotesList)
+                    {
+                        GetNotes resNote = new GetNotes();
+                        resNote.NotesId = notes.NoteId;
+                        resNote.Title = notes.Title;
+                        resNote.Description = notes.Description;
+                        resNote.Color = notes.Color;
+                        resNote.Image = notes.Image;
+                        resNote.IsArchive = notes.IsArchive;
+                        resNote.IsTrash = notes.IsArchive;
+                        resNote.IsPinned = notes.IsPinned;
+                        resNote.Description = notes.Description;
+                        resNote.Reminder = notes.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt");
+                        resNote.CreatedAt = notes.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                        resNote.ModifiedAt = notes.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                        noteList.Add(resNote);
+                    }
+                    return noteList;
+                }
                 else
                     return null;
             }
@@ -130,7 +175,7 @@ namespace RepositoryLayer.Service
                 var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ? resNote.Title : noteUpdate.Title;
+                    resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ?  resNote.Title : noteUpdate.Title;
                     resNote.Description = string.IsNullOrEmpty(noteUpdate.Description) ? resNote.Description : noteUpdate.Description;
                     resNote.Reminder = noteUpdate.Reminder.CompareTo(resNote.Reminder) == 0 ? resNote.Reminder : noteUpdate.Reminder;
                     resNote.Color = string.IsNullOrEmpty(noteUpdate.Color) ? resNote.Color : noteUpdate.Color;

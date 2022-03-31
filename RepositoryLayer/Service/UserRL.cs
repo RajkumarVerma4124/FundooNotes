@@ -189,7 +189,7 @@ namespace RepositoryLayer.Service
             try
             {
                 //Genearting A Json Web Toekn For Authorization
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Jwt:SecretKey"]));
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new[]
                 {
@@ -197,10 +197,10 @@ namespace RepositoryLayer.Service
                 new Claim("UserId", userId.ToString())
                 };
                 var token = new JwtSecurityToken(
-                  issuer: this.configuration["Jwt:Issuer"],
-                  audience: this.configuration["Jwt:Audience"],
+                  issuer: configuration["Jwt:Issuer"],
+                  audience: configuration["Jwt:Audience"],
                   claims,
-                  expires: DateTime.Now.AddMinutes(5),
+                  expires: DateTime.Now.AddMinutes(1),
                   signingCredentials: credentials
                 );
 

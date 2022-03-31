@@ -74,7 +74,7 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = this.notesBL.GetAllNotesByUserId(userId);
-                if (resNote != null)
+                if (resNote.Count() > 0)
                     return this.Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
                 else
                     return this.BadRequest(new { success = false, message = "Notes Retrieval Failed" });
@@ -92,7 +92,7 @@ namespace FundooNotes.Controllers
             try
             {
                 var resNote = this.notesBL.GetAllNotes();
-                if (resNote != null)
+                if (resNote.Count() > 0)
                     return this.Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
                 else
                     return this.BadRequest(new { success = false, message = "Notes Retrieval Failed" });

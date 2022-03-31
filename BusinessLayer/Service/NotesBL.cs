@@ -35,7 +35,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public List<NoteEntity> GetAllNotes()
+        public IList<GetNotes> GetAllNotes()
         {
             try
             {
@@ -47,7 +47,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public List<NoteEntity> GetAllNotesByUserId(long userId)
+        public IList<GetNotes> GetAllNotesByUserId(long userId)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public NoteEntity GetNote(long noteId, long userId)
+        public GetNotes GetNote(long noteId, long userId)
         {
             try
             {

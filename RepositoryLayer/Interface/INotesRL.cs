@@ -12,9 +12,9 @@ namespace RepositoryLayer.Interface
     public interface INotesRL
     {
         NoteEntity CreateNote(UserNotes userNotes, long userId);
-        NoteEntity GetNote(long noteId, long userId);
-        List<NoteEntity> GetAllNotesByUserId(long userId);
-        List<NoteEntity> GetAllNotes();
+        GetNotes GetNote(long noteId, long userId);
+        IList<GetNotes> GetAllNotesByUserId(long userId);
+        IList<GetNotes> GetAllNotes();
         NoteEntity UpdateNote(NoteUpdate noteUpdate, long noteId, long userId);
         string DeleteNote(long noteId, long userId);
         NoteEntity CheckIsArchieveOrNot(long noteId, long userId);
