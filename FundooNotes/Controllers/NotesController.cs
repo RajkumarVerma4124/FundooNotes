@@ -32,7 +32,7 @@ namespace FundooNotes.Controllers
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
-                long userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = this.notesBL.CreateNote(userNotes, userId);
                 if (resNote != null)
                     return this.Ok(new { success = true, message = "Note Created Successfully", data = resNote });
@@ -72,7 +72,7 @@ namespace FundooNotes.Controllers
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
-                long userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = this.notesBL.GetAllNotesByUserId(userId);
                 if (resNote != null)
                     return this.Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
@@ -110,7 +110,7 @@ namespace FundooNotes.Controllers
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
-                long userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = this.notesBL.UpdateNote(noteUpdate, noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { success = true, message = "Updated The Notes Successfully", data = resNote });
@@ -130,12 +130,72 @@ namespace FundooNotes.Controllers
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
-                long userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = this.notesBL.DeleteNote(noteId, userId);
                 if (string.IsNullOrEmpty(resNote))
                     return this.Ok(new { success = true, message = resNote});
                 else
                     return this.BadRequest(new { success = false, message = resNote });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Patch Request For Determining Whether A Particular Note Is Archive Or Not For Particular User Id (PATCH: /api/notes/isarachiveornot)
+        [HttpPatch("IsArchiveOrNot")]
+        public IActionResult CheckIsArchieveOrNot(long noteId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var resNote = this.notesBL.CheckIsArchieveOrNot(noteId, userId);
+                if (resNote != null)
+                    return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                else
+                    return this.BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Patch Request For Determining Whether A Particular Note Is Pinned Or Not For Particular User Id (PATCH: /api/notes/ispinnedornot)
+        [HttpPatch("IsPinnedOrNot")]
+        public IActionResult CheckIsPinnedOrNot(long noteId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var resNote = this.notesBL.CheckIsPinnedOrNot(noteId, userId);
+                if (resNote != null)
+                    return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                else
+                    return this.BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Patch Request For Determining Whether A Particular Note Is Trashed Or Not For Particular User Id (PATCH: /api/notes/istrashornot)
+        [HttpPatch("IsTrashOrNot")]
+        public IActionResult CheckIsTrashOrNot(long noteId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var resNote = this.notesBL.CheckIsTrashOrNot(noteId, userId);
+                if (resNote != null)
+                    return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                else
+                    return this.BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
             }
             catch (Exception ex)
             {

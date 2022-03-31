@@ -127,7 +127,7 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = fundooContext.NotesData.Where(u => u.NoteId == noteId && u.UserId == userId).FirstOrDefault();
+                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ? resNote.Title : noteUpdate.Title;
@@ -159,7 +159,7 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = fundooContext.NotesData.Where(u => u.NoteId == noteId && u.UserId == userId).FirstOrDefault();
+                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     // Deleting And Saving The Changes In The Database For Given NoteId.
@@ -169,6 +169,78 @@ namespace RepositoryLayer.Service
                 }
                 else
                     return "Note Deletion Failed";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Notes Details And Turn IsArchive If True Then False And Vice Versa
+        public NoteEntity CheckIsArchieveOrNot(long noteId, long userId)
+        {
+            try
+            {
+                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                if (resNote != null)
+                {
+                    if (resNote.IsArchive == false)
+                        resNote.IsArchive = true;
+                    else
+                        resNote.IsArchive = false;
+                    fundooContext.SaveChanges();
+                    return resNote;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Notes Details And Turn IsPinned If True Then False And Vice Versa
+        public NoteEntity CheckIsPinnedOrNot(long noteId, long userId)
+        {
+            try
+            {
+                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();  
+                if (resNote != null)
+                {
+                    if (resNote.IsPinned == false)
+                        resNote.IsPinned = true;
+                    else
+                        resNote.IsPinned = false;
+                    fundooContext.SaveChanges();
+                    return resNote;
+                }
+                else
+                    return null;   
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Notes Details And Turn IsTrash If True Then False And Vice Versa
+        public NoteEntity CheckIsTrashOrNot(long noteId, long userId)
+        {
+            try
+            {
+                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                if (resNote != null)
+                {
+                    if (resNote.IsTrash == false)
+                        resNote.IsTrash = true;
+                    else
+                        resNote.IsTrash = false;
+                    fundooContext.SaveChanges();
+                    return resNote;
+                }
+                else
+                    return null;    
             }
             catch (Exception ex)
             {

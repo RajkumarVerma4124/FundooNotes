@@ -46,7 +46,6 @@ namespace FundooNotes
                 au.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 au.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 au.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-
             }).AddJwtBearer(jwt => {
                 jwt.RequireHttpsMetadata = true;
                 jwt.SaveToken = true;
@@ -56,7 +55,7 @@ namespace FundooNotes
                     ValidateAudience = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
                     ValidAudience = Configuration["Jwt:Audience"],
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Configuration["Jwt:SecretKey"]))

@@ -17,5 +17,8 @@ namespace BusinessLayer.Interface
         List<NoteEntity> GetAllNotes();
         NoteEntity UpdateNote(NoteUpdate noteUpdate, long noteId, long userId);
         string DeleteNote(long noteId, long userId);
+        NoteEntity CheckIsArchieveOrNot(long noteId, long userId);
+        NoteEntity CheckIsPinnedOrNot(long noteId, long userId);
+        NoteEntity CheckIsTrashOrNot(long noteId, long userId);
     }
 }
