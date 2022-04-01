@@ -15,5 +15,6 @@ namespace RepositoryLayer.Interface
         LoginResponse Login(UserLogin userLogin);
         string ForgetPassword(string emailId);
         string ResetPassword(ResetPassword resetPassword, string emailId);
+        bool IsEmailIdExist(string emailId);
     }
 }

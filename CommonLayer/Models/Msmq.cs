@@ -15,11 +15,13 @@ namespace CommonLayer.Models
         //Created The Object Reference For MessageQueue
         MessageQueue messageQueue = new MessageQueue();
         private string recieverEmailAddr;
+        private string recieverName;
 
         //Method To Send Token Using MessageQueue And Delegate
-        public void SendMessage(string token,string emailId)
+        public void SendMessage(string token,string emailId, string name)
         {
             recieverEmailAddr = emailId;
+            recieverName = name;
             messageQueue.Path = @".\Private$\Token";
             try
             {
@@ -55,7 +57,22 @@ namespace CommonLayer.Models
                 };
                 mailMessage.From = new MailAddress("iamrajvermapro@gmail.com");
                 mailMessage.To.Add(new MailAddress(recieverEmailAddr));
-                mailMessage.Body = "For Password Changed The Below Token Is Provided \nPlease Copy And Paste In Authorize Box In Swagger :- \n"+token;
+                string mailBody = $"<!DOCTYPE html>" +
+                                  $"<html>" +
+                                  $" <style>" +
+                                  $".blink" +
+                                  $"</style>" +
+                                    $"<body style = \"background-color:#f7ddda;text-align:center;padding:5px;\">" +
+                                    $"<h1 style = \"color:#612118; border-bottom: 3px solid #360b06; margin-top: 5px;\"> Dear <b>{recieverName}</b> </h1>\n" +
+                                    $"<h3 style = \"color:#8f2f22;\"> For Resetting Password The Below Token Is Issued</h3>" +
+                                    $"<h3 style = \"color:#8f2f22;\"> Please Copy The Token And Paste It In Swagger Authorize Value</h3>\n" +
+                                    $"<p style = \"color:#5d6665;\"> {token} </p>\n" +
+                                    $"<h3 style = \"color:#8f2f22;margin-bottom:5px;\"> <blink>This Token Will be Valid For Next 30 Minutes Only<blink></h3>" +
+                                    $"</body>"+
+                                    $"</html>";
+
+                mailMessage.Body = mailBody;
+                mailMessage.IsBodyHtml = true;
                 mailMessage.Subject = "Fundoo Notes Password Reset Link";
                 smtpClient.Send(mailMessage);
             }

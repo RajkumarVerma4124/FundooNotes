@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace FundooNotes.Controllers
 {
@@ -24,16 +25,20 @@ namespace FundooNotes.Controllers
         }
 
         //Post Request For Registering A New User (POST: /api/user/register)
+
         [HttpPost("Register")]
         public IActionResult Register(UserReg userReg)
         {
             try
             {
+                var isExist = userBL.IsEmailIdExist(userReg.EmailId);
+                if (isExist)
+                    return Ok(new { success = false, message = "Registeration Failed EmailId Already Exist" });
                 var resUser = userBL.Register(userReg);
                 if (resUser != null)
-                    return Ok(new { success = true, message = "Registeration Successfully", data = resUser });
+                    return Created("User Added Successfully", new { success = true, data = resUser });
                 else
-                    return BadRequest(new { success = false, message = "Registeration Failed EmailId Already Exist"});
+                    return BadRequest(new { success = false, message = "Something Went Wrong" });
             }
             catch (Exception ex)
             {
@@ -49,7 +54,7 @@ namespace FundooNotes.Controllers
             {
                 var resUser = userBL.Login(userLogin);
                 if (resUser != null)
-                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.UserData.EmailId,  token = resUser.Token});
+                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.UserData.EmailId, token = resUser.Token });
                 else
                     return BadRequest(new { success = false, message = "Login Failed Check EmailId And Password" });
             }

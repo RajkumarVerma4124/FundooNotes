@@ -53,11 +53,13 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (notesId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.GetNote(notesId, userId);
                 if (resNote != null)
                     return this.Ok(new { success = true, message = "Got The Note Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { success = false, message = "Note Retrieval Failed" });
+                    return this.NotFound(new { success = false, message = "Note With Given Id Not Found" });
             }
             catch (Exception ex)
             {
@@ -111,11 +113,13 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.UpdateNote(noteUpdate, noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { success = true, message = "Updated The Notes Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { success = false, message = "Notes Updation Failed" });
+                    return this.NotFound(new { success = false, message = "Note With Given Id Not Found For Update" });
             }
             catch (Exception ex)
             {
@@ -131,11 +135,13 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.DeleteNote(noteId, userId);
                 if (string.IsNullOrEmpty(resNote))
                     return this.Ok(new { success = true, message = resNote});
                 else
-                    return this.BadRequest(new { success = false, message = resNote });
+                    return this.NotFound(new { success = false, message = resNote });
             }
             catch (Exception ex)
             {
@@ -151,11 +157,13 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.ChangeIsArchieveStatus(noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+                    return this.NotFound(new { Success = false, message = "Archive Status Changed Failed" });
             }
             catch (Exception ex)
             {
@@ -171,11 +179,13 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.ChangeIsPinnedStatus(noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                    return this.Ok(new { Success = true, message = "Pinned Status Changed Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+                    return this.NotFound(new { Success = false, message = "Pinned Status Changed Failed" });
             }
             catch (Exception ex)
             {
@@ -191,16 +201,85 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.ChangeIsTrashStatus(noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                    return this.Ok(new { Success = true, message = "Trash Status Changed Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+                    return this.NotFound(new { Success = false, message = "Trash Status Changed Failed" });
             }
             catch (Exception ex)
             {
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
+
+        //Patch Request For Changing The Color Of A Particular Note Is (PATCH: /api/notes/color)
+        [HttpPatch("colour")]
+        public IActionResult ChangeColour(long noteId, string newColor)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                var resNote = this.notesBL.ChangeColour(noteId, userId, newColor);
+                if (resNote != null)
+                    return this.Ok(new { Success = true, message = "Note Colour Changed successfully ", data = resNote });
+                else
+                    return this.NotFound(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Patch Request For Uploading A Image Using Cloudinary (PATCH: /api/notes/uploadimage)
+        [HttpPatch("UploadImage/{noteId}")]
+        public IActionResult UpdateImage(long noteId, IFormFile image)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                var userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                var resNote = this.notesBL.UpdateImage(noteId, userId, image);
+                if (resNote != null)
+                    return this.Ok(new { Success = true, message = "Image Uploaded Successfully", data = resNote });
+                else
+                    return this.NotFound(new { Success = false, message = "Image Upload Failed " });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Patch Request For Deleting A Image Using Notes Id And Used Id (PATCH: /api/notes/deleteimage)
+        [HttpPatch("DeleteImage")]
+        public IActionResult DeleteImage(long noteId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                var resNote = this.notesBL.DeleteImage(noteId, userId);
+                if (resNote != null)
+                    return this.Ok(new { Success = true, message = resNote });
+                else
+                    return this.NotFound(new { Success = false, message = resNote });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }

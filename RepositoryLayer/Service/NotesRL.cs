@@ -1,13 +1,14 @@
-﻿using CommonLayer.Models;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using CommonLayer.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace RepositoryLayer.Service
 {
@@ -19,10 +20,15 @@ namespace RepositoryLayer.Service
         //Reference Object For FundooContext
         private readonly FundooContext fundooContext;
 
+        //Reference Object For configuration
+        private readonly IConfiguration configuration;
+
+
         //Created Constructor To Initialize Fundoocontext For Each Instance
-        public NotesRL(FundooContext fundooContext)
+        public NotesRL(FundooContext fundooContext, IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
+            this.configuration = configuration;
         }
 
         //Method To Create Note With New Notes Data And Userid Into The Db Table
@@ -208,7 +214,7 @@ namespace RepositoryLayer.Service
                     return "Deleted The Note Successfully";
                 }
                 else
-                    return "Note Deletion Failed";
+                    return "Note With Given Id Not Found For Deletion";
             }
             catch (Exception ex)
             {
@@ -281,6 +287,84 @@ namespace RepositoryLayer.Service
                 }
                 else
                     return null;    
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Notes Details And Changed The Color Of The Note
+        public NoteEntity ChangeColour(long noteId, long userId, string newColor)
+        {
+            try
+            {
+                var resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                if (resNote != null)
+                {
+                    resNote.Color = newColor;
+                    fundooContext.SaveChanges();
+                    return resNote;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Notes Details And Update The Image In The Image Field Of Notes Using Cloudinary
+        public NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath)
+        {
+            try
+            {
+                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                if (resNote != null)
+                {
+                    Account account = new Account(configuration["Cloudinary:CloudName"], configuration["Cloudinary:ApiKey"], configuration["Cloudinary:ApiSecret"]);
+                    Cloudinary cloud = new Cloudinary(account);
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(imagePath.FileName, imagePath.OpenReadStream()),
+                    };
+                    var uploadImageRes = cloud.Upload(uploadParams);
+                    if(uploadImageRes != null)
+                    {   
+                        resNote.Image = uploadImageRes.Url.ToString();
+                        fundooContext.NotesData.Update(resNote);
+                        fundooContext.SaveChanges();
+                        return resNote;
+                    }
+                    else 
+                        return null;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Notes Details And Delete The Image In The Image Field Of Notes Using UserId
+        public string DeleteImage(long noteId, long userId)
+        {
+            try
+            {
+                var resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault(); ;
+                if (resNote != null)
+                {
+                    resNote.Image = null;
+                    this.fundooContext.SaveChanges();
+                    return "Deleted The Image Successfully";
+                }
+                else
+                    return "Deletion Of Image Failed";
             }
             catch (Exception ex)
             {

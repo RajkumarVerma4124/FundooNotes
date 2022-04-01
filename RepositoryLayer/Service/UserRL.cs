@@ -32,30 +32,29 @@ namespace RepositoryLayer.Service
             this.configuration = configuration;
         }
 
+        //Method to check if current email id provided by user is exist in db or not;
+        public bool IsEmailIdExist(string emailId)
+        {
+            var emailIds = fundooContext.UserData.Where(eu => eu.EmailId == emailId).Count();
+            return emailIds > 0 ? true : false;
+        }
+
         //Method to register user with new user data into the db table
         public UserEntity Register(UserReg userReg)
         {
             try
             {
-                //Check the user email before if emailid is already exits in database or not 
-                var userDataResult = fundooContext.UserData.FirstOrDefault(eu => eu.EmailId == userReg.EmailId);
-                if (userDataResult == null)
-                {
-                    UserEntity userEntity = new UserEntity();
-                    userEntity.FirstName = userReg.FirstName;
-                    userEntity.LastName = userReg.LastName;
-                    userEntity.EmailId = userReg.EmailId;
-                    userEntity.Password = PasswordEncrypt(userReg.Password);
-                    fundooContext.UserData.Add(userEntity);
-                    int res = fundooContext.SaveChanges();
-                    if (res > 0)
-                        return userEntity;
-                    else
-                        return null;
-                }
+                UserEntity userEntity = new UserEntity();
+                userEntity.FirstName = userReg.FirstName;
+                userEntity.LastName = userReg.LastName;
+                userEntity.EmailId = userReg.EmailId;
+                userEntity.Password = PasswordEncrypt(userReg.Password);
+                fundooContext.UserData.Add(userEntity);
+                int res = fundooContext.SaveChanges();
+                if (res > 0)
+                    return userEntity;
                 else
-                    return null;
-
+                    return null;          
             }
             catch (Exception ex)
             {
@@ -106,7 +105,7 @@ namespace RepositoryLayer.Service
                 if (userDetails != null)
                 {
                     var token = GenerateSecurityToken(userDetails.EmailId, userDetails.UserId);
-                    new Msmq().SendMessage(token, userDetails.EmailId);
+                    new Msmq().SendMessage(token, userDetails.EmailId, userDetails.FirstName);
                     return token;
                 }
                 else
@@ -200,10 +199,9 @@ namespace RepositoryLayer.Service
                   issuer: configuration["Jwt:Issuer"],
                   audience: configuration["Jwt:Audience"],
                   claims,
-                  expires: DateTime.Now.AddMinutes(30),
+                  expires: DateTime.Now.AddHours(1),
                   signingCredentials: credentials
                 );
-
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception ex)

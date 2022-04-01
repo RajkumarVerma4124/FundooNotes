@@ -74,5 +74,17 @@ namespace BusinessLayer.Service
                 throw ex;
             }
         }
+
+        public bool IsEmailIdExist(string emailId)
+        {
+            try
+            {
+                return this.userRL.IsEmailIdExist(emailId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

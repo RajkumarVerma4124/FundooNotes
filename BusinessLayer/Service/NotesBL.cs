@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using CommonLayer.Models;
+using Microsoft.AspNetCore.Http;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
 using System;
@@ -124,6 +125,42 @@ namespace BusinessLayer.Service
             try
             {
                 return notesRL.ChangeIsTrashStatus(noteId, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public NoteEntity ChangeColour(long noteId, long userId, string newColor)
+        {
+            try
+            {
+                return notesRL.ChangeColour(noteId, userId, newColor);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public NoteEntity UpdateImage(long noteId, long userId, IFormFile imageFile)
+        {
+            try
+            {
+                return notesRL.UpdateImage(noteId, userId, imageFile);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public string DeleteImage(long noteId, long userId)
+        {
+            try
+            {
+                return notesRL.DeleteImage(noteId, userId);
             }
             catch (Exception ex)
             {
