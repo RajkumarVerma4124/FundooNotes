@@ -333,6 +333,7 @@ namespace RepositoryLayer.Service
                     if(uploadImageRes != null)
                     {   
                         resNote.Image = uploadImageRes.Url.ToString();
+                        resNote.ModifiedAt = DateTime.Now;
                         fundooContext.NotesData.Update(resNote);
                         fundooContext.SaveChanges();
                         return resNote;

@@ -237,8 +237,8 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Patch Request For Uploading A Image Using Cloudinary (PATCH: /api/notes/uploadimage)
-        [HttpPatch("UploadImage/{noteId}")]
+        //Put Request For Uploading A Image Using Cloudinary (PATCH: /api/notes/uploadimage)
+        [HttpPut("UploadImage/{noteId}")]
         public IActionResult UpdateImage(long noteId, IFormFile image)
         {
             try
