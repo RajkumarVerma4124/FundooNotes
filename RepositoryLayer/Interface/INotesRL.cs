@@ -13,12 +13,12 @@ namespace RepositoryLayer.Interface
     {
         NoteEntity CreateNote(UserNotes userNotes, long userId);
         GetNotes GetNote(long noteId, long userId);
-        IList<GetNotes> GetAllNotesByUserId(long userId);
-        IList<GetNotes> GetAllNotes();
+        IEnumerable<GetNotes> GetAllNotesByUserId(long userId);
+        IEnumerable<GetNotes> GetAllNotes();
         NoteEntity UpdateNote(NoteUpdate noteUpdate, long noteId, long userId);
         string DeleteNote(long noteId, long userId);
-        NoteEntity CheckIsArchieveOrNot(long noteId, long userId);
-        NoteEntity CheckIsPinnedOrNot(long noteId, long userId);
-        NoteEntity CheckIsTrashOrNot(long noteId, long userId);
+        NoteEntity ChangeIsArchieveStatus(long noteId, long userId);
+        NoteEntity ChangeIsPinnedStatus(long noteId, long userId);
+        NoteEntity ChangeIsTrashStatus(long noteId, long userId);
     }
 }

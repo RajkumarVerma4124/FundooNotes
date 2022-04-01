@@ -35,7 +35,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public IList<GetNotes> GetAllNotes()
+        public IEnumerable<GetNotes> GetAllNotes()
         {
             try
             {
@@ -47,7 +47,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public IList<GetNotes> GetAllNotesByUserId(long userId)
+        public IEnumerable<GetNotes> GetAllNotesByUserId(long userId)
         {
             try
             {
@@ -95,11 +95,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public NoteEntity CheckIsArchieveOrNot(long noteId, long userId)
+        public NoteEntity ChangeIsArchieveStatus(long noteId, long userId)
         {
             try
             {
-                return notesRL.CheckIsArchieveOrNot(noteId, userId);
+                return notesRL.ChangeIsArchieveStatus(noteId, userId);
             }
             catch (Exception ex)
             {
@@ -107,11 +107,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public NoteEntity CheckIsPinnedOrNot(long noteId, long userId)
+        public NoteEntity ChangeIsPinnedStatus(long noteId, long userId)
         {
             try
             {
-                return notesRL.CheckIsPinnedOrNot(noteId, userId);
+                return notesRL.ChangeIsPinnedStatus(noteId, userId);
             }
             catch (Exception ex)
             {
@@ -119,11 +119,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public NoteEntity CheckIsTrashOrNot(long noteId, long userId)
+        public NoteEntity ChangeIsTrashStatus(long noteId, long userId)
         {
             try
             {
-                return notesRL.CheckIsTrashOrNot(noteId, userId);
+                return notesRL.ChangeIsTrashStatus(noteId, userId);
             }
             catch (Exception ex)
             {

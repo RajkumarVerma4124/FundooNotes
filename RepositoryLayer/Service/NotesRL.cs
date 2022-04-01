@@ -30,28 +30,23 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                if (!userId.Equals(null))
-                {
-                    NoteEntity notesEntity = new NoteEntity();
-                    notesEntity.Title = userNotes.Title;
-                    notesEntity.Description = userNotes.Description;
-                    notesEntity.Reminder = userNotes.Reminder;
-                    notesEntity.Color = userNotes.Color;
-                    notesEntity.Image = userNotes.Image;
-                    notesEntity.IsTrash = userNotes.IsTrash;
-                    notesEntity.IsArchive = userNotes.IsArchive;
-                    notesEntity.IsPinned = userNotes.IsPinned;
-                    notesEntity.CreatedAt = DateTime.Now;
-                    notesEntity.ModifiedAt = DateTime.Now;
-                    notesEntity.UserId = userId;
-                    fundooContext.NotesData.Add(notesEntity);
-                    //Adding The Data And Saving The Changes In Database
-                    int res = fundooContext.SaveChanges();
-                    if (res > 0)
-                        return notesEntity;
-                    else
-                        return null;
-                }
+                NoteEntity notesEntity = new NoteEntity();
+                notesEntity.Title = userNotes.Title;
+                notesEntity.Description = userNotes.Description;
+                notesEntity.Reminder = userNotes.Reminder;
+                notesEntity.Color = userNotes.Color;
+                notesEntity.Image = userNotes.Image;
+                notesEntity.IsTrash = userNotes.IsTrash;
+                notesEntity.IsArchive = userNotes.IsArchive;
+                notesEntity.IsPinned = userNotes.IsPinned;
+                notesEntity.CreatedAt = DateTime.Now;
+                notesEntity.ModifiedAt = DateTime.Now;
+                notesEntity.UserId = userId;
+                //Adding The Data And Saving The Changes In Database
+                fundooContext.NotesData.Add(notesEntity);
+                int res = fundooContext.SaveChanges();
+                if (res > 0)
+                    return notesEntity;
                 else
                     return null;
             }
@@ -94,7 +89,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Multiple Notes Details By User Ids
-        public IList<GetNotes> GetAllNotesByUserId(long userId)
+        public IEnumerable<GetNotes> GetAllNotesByUserId(long userId)
         {
             try
             {
@@ -131,7 +126,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Multiple Notes Details From DB
-        public IList<GetNotes> GetAllNotes()
+        public IEnumerable<GetNotes> GetAllNotes()
         {
             try
             {
@@ -222,7 +217,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Notes Details And Turn IsArchive If True Then False And Vice Versa
-        public NoteEntity CheckIsArchieveOrNot(long noteId, long userId)
+        public NoteEntity ChangeIsArchieveStatus(long noteId, long userId)
         {
             try
             {
@@ -246,7 +241,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Notes Details And Turn IsPinned If True Then False And Vice Versa
-        public NoteEntity CheckIsPinnedOrNot(long noteId, long userId)
+        public NoteEntity ChangeIsPinnedStatus(long noteId, long userId)
         {
             try
             {
@@ -270,7 +265,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Notes Details And Turn IsTrash If True Then False And Vice Versa
-        public NoteEntity CheckIsTrashOrNot(long noteId, long userId)
+        public NoteEntity ChangeIsTrashStatus(long noteId, long userId)
         {
             try
             {

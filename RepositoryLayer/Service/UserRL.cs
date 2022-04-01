@@ -200,7 +200,7 @@ namespace RepositoryLayer.Service
                   issuer: configuration["Jwt:Issuer"],
                   audience: configuration["Jwt:Audience"],
                   claims,
-                  expires: DateTime.Now.AddMinutes(1),
+                  expires: DateTime.Now.AddMinutes(30),
                   signingCredentials: credentials
                 );
 

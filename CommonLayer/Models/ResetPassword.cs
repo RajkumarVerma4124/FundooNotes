@@ -5,6 +5,9 @@ using System.Text;
 
 namespace CommonLayer.Models
 {
+    /// <summary>
+    /// Created The Class For User Notes Reset Password Request
+    /// </summary>
     public class ResetPassword
     {
         //Checking The Pattern For Password And Giving Required Annotations For Password Property

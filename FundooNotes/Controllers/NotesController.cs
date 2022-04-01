@@ -26,7 +26,7 @@ namespace FundooNotes.Controllers
         }
 
         //Post Request For Creating A New Notes For Particular User Id (POST: /api/notes/createnote)
-        [HttpPost("CreateNote")]
+        [HttpPost("Create")]
         public IActionResult CreateNote(UserNotes userNotes)
         {
             try
@@ -46,7 +46,7 @@ namespace FundooNotes.Controllers
         }
 
         //Get Request For Retreiving A Single Note For Particular User Id (GET: /api/notes/getnote)
-        [HttpGet("GetNote/notesId")]
+        [HttpGet("Get/{notesId}")]
         public IActionResult GetNote(long notesId)
         {
             try
@@ -65,8 +65,8 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Get Request For Retreiving A Multiple Notes For Particular User Id (GET: /api/notes/getallnote)
-        [HttpGet("GetAllNotes")]
+        //Get Request For Retreiving A Multiple Notes For Particular User Id (GET: /api/notes/getusers)
+        [HttpGet("GetUsers")]
         public IActionResult GetAllNotesByUserId()
         {
             try
@@ -104,7 +104,7 @@ namespace FundooNotes.Controllers
         }
 
         //Put Request For Updating A Particular Notes For Particular User Id (PUT: /api/notes/updatenote)
-        [HttpPut("UpdateNote")]
+        [HttpPut("Update")]
         public IActionResult UpdateNote(NoteUpdate noteUpdate, long noteId)
         {
             try
@@ -124,7 +124,7 @@ namespace FundooNotes.Controllers
         }
 
         //Delete Request For Deleting A Particular Note For Particular User Id (PUT: /api/notes/deletenote)
-        [HttpDelete("DeleteNote")]
+        [HttpDelete("Delete")]
         public IActionResult DeleteNote(long noteId)
         {
             try
@@ -144,14 +144,14 @@ namespace FundooNotes.Controllers
         }
 
         //Patch Request For Determining Whether A Particular Note Is Archive Or Not For Particular User Id (PATCH: /api/notes/isarachiveornot)
-        [HttpPatch("IsArchiveOrNot")]
-        public IActionResult CheckIsArchieveOrNot(long noteId)
+        [HttpPatch("IsArchive")]
+        public IActionResult ChangeIsArchieveStatus(long noteId)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var resNote = this.notesBL.CheckIsArchieveOrNot(noteId, userId);
+                var resNote = this.notesBL.ChangeIsArchieveStatus(noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
                 else
@@ -164,14 +164,14 @@ namespace FundooNotes.Controllers
         }
 
         //Patch Request For Determining Whether A Particular Note Is Pinned Or Not For Particular User Id (PATCH: /api/notes/ispinnedornot)
-        [HttpPatch("IsPinnedOrNot")]
-        public IActionResult CheckIsPinnedOrNot(long noteId)
+        [HttpPatch("IsPinned")]
+        public IActionResult ChangeIsPinnedStatus(long noteId)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var resNote = this.notesBL.CheckIsPinnedOrNot(noteId, userId);
+                var resNote = this.notesBL.ChangeIsPinnedStatus(noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
                 else
@@ -184,14 +184,14 @@ namespace FundooNotes.Controllers
         }
 
         //Patch Request For Determining Whether A Particular Note Is Trashed Or Not For Particular User Id (PATCH: /api/notes/istrashornot)
-        [HttpPatch("IsTrashOrNot")]
-        public IActionResult CheckIsTrashOrNot(long noteId)
+        [HttpPatch("IsTrash")]
+        public IActionResult ChangeIsTrashStatus(long noteId)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var resNote = this.notesBL.CheckIsTrashOrNot(noteId, userId);
+                var resNote = this.notesBL.ChangeIsTrashStatus(noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
                 else

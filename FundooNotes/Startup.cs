@@ -55,6 +55,7 @@ namespace FundooNotes
                     ValidateAudience = true,
                     ValidIssuer = Configuration["Jwt:Issuer"],
                     ValidAudience = Configuration["Jwt:Audience"],
+                    //Validate the expiration and not before values in the token
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                     ValidateIssuerSigningKey = true,
