@@ -11,10 +11,10 @@ namespace RepositoryLayer.Interface
     /// </summary>
     public interface IUserRL
     {
+        bool IsEmailIdExist(string emailId);
         UserEntity Register(UserReg userReg);
         LoginResponse Login(UserLogin userLogin);
         string ForgetPassword(string emailId);
         string ResetPassword(ResetPassword resetPassword, string emailId);
-        bool IsEmailIdExist(string emailId);
     }
 }

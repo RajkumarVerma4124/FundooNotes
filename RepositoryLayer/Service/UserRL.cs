@@ -32,11 +32,11 @@ namespace RepositoryLayer.Service
             this.configuration = configuration;
         }
 
-        //Method to check if current email id provided by user is exist in db or not;
+        //Method to check if current email id provided by user is exist in db table or not;
         public bool IsEmailIdExist(string emailId)
         {
             var emailIds = fundooContext.UserData.Where(eu => eu.EmailId == emailId).Count();
-            return emailIds > 0 ? true : false;
+            return emailIds > 0;
         }
 
         //Method to register user with new user data into the db table

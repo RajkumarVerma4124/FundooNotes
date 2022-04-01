@@ -11,8 +11,8 @@ namespace BusinessLayer.Interface
     /// </summary>
     public interface IUserBL
     {
-        UserEntity Register(UserReg userReg);
         bool IsEmailIdExist(string emailId);
+        UserEntity Register(UserReg userReg);
         LoginResponse Login(UserLogin userLogin);
         string ForgetPassword(string emailId);
         string ResetPassword(ResetPassword resetPassword, string emailId);

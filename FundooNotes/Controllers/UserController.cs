@@ -31,8 +31,8 @@ namespace FundooNotes.Controllers
         {
             try
             {
-                var isExist = userBL.IsEmailIdExist(userReg.EmailId);
-                if (isExist)
+                var ifEmailExist = userBL.IsEmailIdExist(userReg.EmailId);
+                if (ifEmailExist)
                     return Ok(new { success = false, message = "Registeration Failed EmailId Already Exist" });
                 var resUser = userBL.Register(userReg);
                 if (resUser != null)

@@ -75,6 +75,7 @@ namespace BusinessLayer.Service
             }
         }
 
+        //Method To Call And Return IsEmailIdExist Result 
         public bool IsEmailIdExist(string emailId)
         {
             try
