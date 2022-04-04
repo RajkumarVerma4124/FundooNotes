@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FundooNotes.Controllers
@@ -27,7 +28,7 @@ namespace FundooNotes.Controllers
 
         //Post Request For Creating A New Notes For Particular User Id (POST: /api/notes/createnote)
         [HttpPost("Create")]
-        public IActionResult CreateNote(UserNotes userNotes)
+        public IActionResult CreateNote([FromForm] UserNotes userNotes)
         {
             try
             {
@@ -238,7 +239,7 @@ namespace FundooNotes.Controllers
         }
 
         //Put Request For Uploading A Image Using Cloudinary (PATCH: /api/notes/uploadimage)
-        [HttpPut("UploadImage/{noteId}")]
+        [HttpPut("UpdateImage/{noteId}")]
         public IActionResult UpdateImage(long noteId, IFormFile image)
         {
             try
@@ -249,9 +250,9 @@ namespace FundooNotes.Controllers
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 var resNote = this.notesBL.UpdateImage(noteId, userId, image);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Image Uploaded Successfully", data = resNote });
+                    return this.Ok(new { Success = true, message = "Image Updated Successfully", data = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = "Image Upload Failed " });
+                    return this.NotFound(new { Success = false, message = "Image Updated Failed " });
             }
             catch (Exception ex)
             {
@@ -260,7 +261,7 @@ namespace FundooNotes.Controllers
         }
 
         //Patch Request For Deleting A Image Using Notes Id And Used Id (PATCH: /api/notes/deleteimage)
-        [HttpPatch("DeleteImage")]
+        [HttpPut("DeleteImage")]
         public IActionResult DeleteImage(long noteId)
         {
             try

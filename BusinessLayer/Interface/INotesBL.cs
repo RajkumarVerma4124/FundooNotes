@@ -22,7 +22,7 @@ namespace BusinessLayer.Interface
         NoteEntity ChangeIsPinnedStatus(long noteId, long userId);
         NoteEntity ChangeIsTrashStatus(long noteId, long userId);
         NoteEntity ChangeColour(long noteId, long userId, string newColor);
-        NoteEntity UpdateImage(long noteId, long userId, IFormFile imageFile);
+        NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath);
         string DeleteImage(long noteId, long userId);
     }
 }

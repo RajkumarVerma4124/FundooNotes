@@ -36,23 +36,25 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                NoteEntity notesEntity = new NoteEntity();
-                notesEntity.Title = userNotes.Title;
-                notesEntity.Description = userNotes.Description;
-                notesEntity.Reminder = userNotes.Reminder;
-                notesEntity.Color = userNotes.Color;
-                notesEntity.Image = userNotes.Image;
-                notesEntity.IsTrash = userNotes.IsTrash;
-                notesEntity.IsArchive = userNotes.IsArchive;
-                notesEntity.IsPinned = userNotes.IsPinned;
-                notesEntity.CreatedAt = DateTime.Now;
-                notesEntity.ModifiedAt = DateTime.Now;
-                notesEntity.UserId = userId;
+                NoteEntity notesEntity = new NoteEntity
+                {
+                    Title = userNotes.Title,
+                    Description = userNotes.Description,
+                    Reminder = userNotes.Reminder,
+                    Color = userNotes.Color,
+                    Image = UploadImage(userNotes.ImagePath).Url.ToString(),
+                    IsTrash = userNotes.IsTrash,
+                    IsArchive = userNotes.IsArchive,
+                    IsPinned = userNotes.IsPinned,
+                    CreatedAt = DateTime.Now,
+                    ModifiedAt = DateTime.Now,
+                    UserId = userId
+                };
                 //Adding The Data And Saving The Changes In Database
                 fundooContext.NotesData.Add(notesEntity);
                 int res = fundooContext.SaveChanges();
                 if (res > 0)
-                    return notesEntity;
+                    return notesEntity;     
                 else
                     return null;
             }
@@ -70,19 +72,21 @@ namespace RepositoryLayer.Service
                 var resultNote = fundooContext.NotesData.Where(n => n.UserId == userId && n.NoteId == noteId).FirstOrDefault();
                 if (resultNote != null)
                 {
-                    GetNotes resNote = new GetNotes();
-                    resNote.NotesId = resultNote.NoteId;
-                    resNote.Title = resultNote.Title;
-                    resNote.Description = resultNote.Description;
-                    resNote.Color = resultNote.Color;
-                    resNote.Image = resultNote.Image;
-                    resNote.IsArchive = resultNote.IsArchive;
-                    resNote.IsTrash = resultNote.IsArchive;
-                    resNote.IsPinned = resultNote.IsPinned;
-                    resNote.Description = resultNote.Description;
-                    resNote.Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt");
-                    resNote.CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
-                    resNote.ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
+                    GetNotes resNote = new GetNotes
+                    {
+                        NotesId = resultNote.NoteId,
+                        Title = resultNote.Title,
+                        Description = resultNote.Description,
+                        Color = resultNote.Color,
+                        Image = resultNote.Image,
+                        IsArchive = resultNote.IsArchive,
+                        IsTrash = resultNote.IsArchive,
+                        IsPinned = resultNote.IsPinned,
+                        Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt")
+                    };
+
                     return resNote;
                 }
                 else
@@ -103,22 +107,23 @@ namespace RepositoryLayer.Service
                 var resNotesList = fundooContext.NotesData.Where(n => n.UserId == userId).ToList();
                 if (resNotesList.Count() > 0) 
                 { 
-                    foreach (var notes in resNotesList)
+                    foreach (var resultNote in resNotesList)
                     {
-                        GetNotes resNote = new GetNotes();
-                        resNote.NotesId = notes.NoteId;
-                        resNote.Title = notes.Title;
-                        resNote.Description = notes.Description;
-                        resNote.Color = notes.Color;
-                        resNote.Image = notes.Image;
-                        resNote.IsArchive = notes.IsArchive;
-                        resNote.IsTrash = notes.IsArchive;
-                        resNote.IsPinned = notes.IsPinned;
-                        resNote.Description = notes.Description;
-                        resNote.Reminder = notes.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt");
-                        resNote.CreatedAt = notes.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
-                        resNote.ModifiedAt = notes.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
-                        noteList.Add(resNote);
+                        GetNotes note = new GetNotes
+                        {
+                            NotesId = resultNote.NoteId,
+                            Title = resultNote.Title,
+                            Description = resultNote.Description,
+                            Color = resultNote.Color,
+                            Image = resultNote.Image,
+                            IsArchive = resultNote.IsArchive,
+                            IsTrash = resultNote.IsArchive,
+                            IsPinned = resultNote.IsPinned,
+                            Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        };
+                        noteList.Add(note);
                     }
                     return noteList; 
                 }
@@ -140,22 +145,23 @@ namespace RepositoryLayer.Service
                 var resNotesList = fundooContext.NotesData.ToList();
                 if (resNotesList.Count() > 0)
                 {
-                    foreach (var notes in resNotesList)
+                    foreach (var resultNote in resNotesList)
                     {
-                        GetNotes resNote = new GetNotes();
-                        resNote.NotesId = notes.NoteId;
-                        resNote.Title = notes.Title;
-                        resNote.Description = notes.Description;
-                        resNote.Color = notes.Color;
-                        resNote.Image = notes.Image;
-                        resNote.IsArchive = notes.IsArchive;
-                        resNote.IsTrash = notes.IsArchive;
-                        resNote.IsPinned = notes.IsPinned;
-                        resNote.Description = notes.Description;
-                        resNote.Reminder = notes.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt");
-                        resNote.CreatedAt = notes.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
-                        resNote.ModifiedAt = notes.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt");
-                        noteList.Add(resNote);
+                        GetNotes note = new GetNotes
+                        {
+                            NotesId = resultNote.NoteId,
+                            Title = resultNote.Title,
+                            Description = resultNote.Description,
+                            Color = resultNote.Color,
+                            Image = resultNote.Image,
+                            IsArchive = resultNote.IsArchive,
+                            IsTrash = resultNote.IsArchive,
+                            IsPinned = resultNote.IsPinned,
+                            Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        };
+                        noteList.Add(note);
                     }
                     return noteList;
                 }
@@ -315,6 +321,29 @@ namespace RepositoryLayer.Service
             }
         }
 
+        //Method To Upload The Image And Resturn ImageUploadResult
+        public ImageUploadResult UploadImage(IFormFile imagePath)
+        {
+            try
+            {
+                Account account = new Account(configuration["Cloudinary:CloudName"], configuration["Cloudinary:ApiKey"], configuration["Cloudinary:ApiSecret"]);
+                Cloudinary cloud = new Cloudinary(account);    
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(imagePath.FileName, imagePath.OpenReadStream()),
+                };
+                var uploadImageRes = cloud.Upload(uploadParams);
+                if (uploadImageRes != null)
+                    return uploadImageRes;
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         //Method To Fetch The Notes Details And Update The Image In The Image Field Of Notes Using Cloudinary
         public NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath)
         {
@@ -323,23 +352,11 @@ namespace RepositoryLayer.Service
                 var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    Account account = new Account(configuration["Cloudinary:CloudName"], configuration["Cloudinary:ApiKey"], configuration["Cloudinary:ApiSecret"]);
-                    Cloudinary cloud = new Cloudinary(account);
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(imagePath.FileName, imagePath.OpenReadStream()),
-                    };
-                    var uploadImageRes = cloud.Upload(uploadParams);
-                    if(uploadImageRes != null)
-                    {   
-                        resNote.Image = uploadImageRes.Url.ToString();
-                        resNote.ModifiedAt = DateTime.Now;
-                        fundooContext.NotesData.Update(resNote);
-                        fundooContext.SaveChanges();
-                        return resNote;
-                    }
-                    else 
-                        return null;
+                    resNote.Image = UploadImage(imagePath).Url.ToString();
+                    resNote.ModifiedAt = DateTime.Now;
+                    fundooContext.NotesData.Update(resNote);
+                    fundooContext.SaveChanges();
+                    return resNote;
                 }
                 else
                 {
@@ -361,7 +378,9 @@ namespace RepositoryLayer.Service
                 if (resNote != null)
                 {
                     resNote.Image = null;
-                    this.fundooContext.SaveChanges();
+                    resNote.ModifiedAt = DateTime.Now;
+                    fundooContext.NotesData.Update(resNote);
+                    fundooContext.SaveChanges();
                     return "Deleted The Image Successfully";
                 }
                 else

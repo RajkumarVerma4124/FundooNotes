@@ -144,11 +144,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public NoteEntity UpdateImage(long noteId, long userId, IFormFile imageFile)
+        public NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath)
         {
             try
             {
-                return notesRL.UpdateImage(noteId, userId, imageFile);
+                return notesRL.UpdateImage(noteId, userId, imagePath);
             }
             catch (Exception ex)
             {
