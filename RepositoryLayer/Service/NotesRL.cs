@@ -32,17 +32,17 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Create Note With New Notes Data And Userid Into The Db Table
-        public NoteEntity CreateNote(UserNotes userNotes, long userId)
+        public NotesResponse CreateNote(UserNotes userNotes, long userId)
         {
             try
             {
+                IEnumerable<ImageEntity> imageList = null;
                 NoteEntity notesEntity = new NoteEntity
                 {
                     Title = userNotes.Title,
                     Description = userNotes.Description,
                     Reminder = userNotes.Reminder,
                     Color = userNotes.Color,
-                    Image = UploadImage(userNotes.ImagePath).Url.ToString(),
                     IsTrash = userNotes.IsTrash,
                     IsArchive = userNotes.IsArchive,
                     IsPinned = userNotes.IsPinned,
@@ -53,8 +53,20 @@ namespace RepositoryLayer.Service
                 //Adding The Data And Saving The Changes In Database
                 fundooContext.NotesData.Add(notesEntity);
                 int res = fundooContext.SaveChanges();
+                if(userNotes.ImagePaths.Count > 0)
+                {
+                    long noteId = notesEntity.NoteId;
+                    imageList = AddImages(noteId, userId, userNotes.ImagePaths);
+                }
                 if (res > 0)
-                    return notesEntity;     
+                {
+                    NotesResponse notesResponse = new NotesResponse()
+                    {
+                        NotesDetails = notesEntity,
+                        ImagesDetails = imageList,
+                    };
+                    return notesResponse;
+                }
                 else
                     return null;
             }
@@ -65,28 +77,28 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Single Note Details By Giving Note And User Ids
-        public GetNotes GetNote(long noteId, long userId)
+        public GetNotesResponse GetNote(long noteId, long userId)
         {
             try
             {
                 var resultNote = fundooContext.NotesData.Where(n => n.UserId == userId && n.NoteId == noteId).FirstOrDefault();
+                var imageList = fundooContext.ImagesData.Where(n => n.NoteId == noteId).ToList();
                 if (resultNote != null)
                 {
-                    GetNotes resNote = new GetNotes
+                    GetNotesResponse resNote = new GetNotesResponse
                     {
                         NotesId = resultNote.NoteId,
                         Title = resultNote.Title,
                         Description = resultNote.Description,
                         Color = resultNote.Color,
-                        Image = resultNote.Image,
                         IsArchive = resultNote.IsArchive,
-                        IsTrash = resultNote.IsArchive,
+                        IsTrash = resultNote.IsTrash,
                         IsPinned = resultNote.IsPinned,
                         Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
-                        ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt")
+                        ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        ImageList = imageList
                     };
-
                     return resNote;
                 }
                 else
@@ -99,29 +111,31 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Multiple Notes Details By User Ids
-        public IEnumerable<GetNotes> GetAllNotesByUserId(long userId)
+        public IEnumerable<GetNotesResponse> GetAllNotesByUserId(long userId)
         {
             try
             {
-                IList<GetNotes> noteList = new List<GetNotes>();
+                IEnumerable<ImageEntity> imageList = null;
+                IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
                 var resNotesList = fundooContext.NotesData.Where(n => n.UserId == userId).ToList();
                 if (resNotesList.Count() > 0) 
                 { 
                     foreach (var resultNote in resNotesList)
                     {
-                        GetNotes note = new GetNotes
+                        imageList = fundooContext.ImagesData.Where(n => n.NoteId == resultNote.NoteId).ToList();
+                        GetNotesResponse note = new GetNotesResponse
                         {
                             NotesId = resultNote.NoteId,
                             Title = resultNote.Title,
                             Description = resultNote.Description,
                             Color = resultNote.Color,
-                            Image = resultNote.Image,
                             IsArchive = resultNote.IsArchive,
-                            IsTrash = resultNote.IsArchive,
+                            IsTrash = resultNote.IsTrash,
                             IsPinned = resultNote.IsPinned,
                             Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            ImageList = imageList
                         };
                         noteList.Add(note);
                     }
@@ -137,29 +151,31 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Multiple Notes Details From DB
-        public IEnumerable<GetNotes> GetAllNotes()
+        public IEnumerable<GetNotesResponse> GetAllNotes()
         {
             try
             {
-                IList<GetNotes> noteList = new List<GetNotes>();
+                IEnumerable<ImageEntity> imageList = null;
+                IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
                 var resNotesList = fundooContext.NotesData.ToList();
                 if (resNotesList.Count() > 0)
                 {
                     foreach (var resultNote in resNotesList)
                     {
-                        GetNotes note = new GetNotes
+                        imageList = fundooContext.ImagesData.Where(n => n.NoteId == resultNote.NoteId).ToList();
+                        GetNotesResponse note = new GetNotesResponse
                         {
                             NotesId = resultNote.NoteId,
                             Title = resultNote.Title,
                             Description = resultNote.Description,
                             Color = resultNote.Color,
-                            Image = resultNote.Image,
                             IsArchive = resultNote.IsArchive,
-                            IsTrash = resultNote.IsArchive,
+                            IsTrash = resultNote.IsTrash,
                             IsPinned = resultNote.IsPinned,
                             Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            ImageList = imageList
                         };
                         noteList.Add(note);
                     }
@@ -186,7 +202,6 @@ namespace RepositoryLayer.Service
                     resNote.Description = string.IsNullOrEmpty(noteUpdate.Description) ? resNote.Description : noteUpdate.Description;
                     resNote.Reminder = noteUpdate.Reminder.CompareTo(resNote.Reminder) == 0 ? resNote.Reminder : noteUpdate.Reminder;
                     resNote.Color = string.IsNullOrEmpty(noteUpdate.Color) ? resNote.Color : noteUpdate.Color;
-                    resNote.Image = string.IsNullOrEmpty(noteUpdate.Image) ? resNote.Image : noteUpdate.Image;
                     resNote.IsTrash = noteUpdate.IsTrash.CompareTo(resNote.IsTrash) == 0 ? resNote.IsTrash : noteUpdate.IsTrash;
                     resNote.IsArchive = noteUpdate.IsArchive.CompareTo(resNote.IsArchive) == 0 ? resNote.IsArchive : noteUpdate.IsArchive;
                     resNote.IsPinned = noteUpdate.IsPinned.CompareTo(resNote.IsPinned) == 0 ? resNote.IsPinned : noteUpdate.IsPinned;
@@ -345,18 +360,29 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Notes Details And Update The Image In The Image Field Of Notes Using Cloudinary
-        public NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath)
+        public IEnumerable<ImageEntity> AddImages(long noteId, long userId, ICollection<IFormFile> imagesPath)
         {
             try
             {
                 var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    resNote.Image = UploadImage(imagePath).Url.ToString();
-                    resNote.ModifiedAt = DateTime.Now;
-                    fundooContext.NotesData.Update(resNote);
-                    fundooContext.SaveChanges();
-                    return resNote;
+                    IList<ImageEntity> images = new List<ImageEntity>();
+                    foreach (var file in imagesPath)
+                    {
+                        ImageEntity imageEntity = new ImageEntity();
+                        var uploadImageRes = UploadImage(file);
+                        imageEntity.NoteId = noteId;
+                        imageEntity.ImageUrl = uploadImageRes.Url.ToString();
+                        imageEntity.ImageName = file.FileName;
+                        images.Add(imageEntity);
+                        fundooContext.ImagesData.Add(imageEntity);
+                        fundooContext.SaveChanges();
+                        resNote.ModifiedAt = DateTime.Now;
+                        fundooContext.NotesData.Update(resNote);
+                        fundooContext.SaveChanges();
+                    }
+                    return images;
                 }
                 else
                 {
@@ -370,14 +396,16 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Notes Details And Delete The Image In The Image Field Of Notes Using UserId
-        public string DeleteImage(long noteId, long userId)
+        public string DeleteImage(long imageId, long noteId, long userId)
         {
             try
             {
-                var resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault(); ;
-                if (resNote != null)
+                var resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                var imageRes = this.fundooContext.ImagesData.Where(n => n.ImageId == imageId).FirstOrDefault();
+                if (resNote != null && imageRes != null)
                 {
-                    resNote.Image = null;
+                    // Deleting And Saving The Changes In The Database For Given ImageId.
+                    fundooContext.ImagesData.Remove(imageRes);
                     resNote.ModifiedAt = DateTime.Now;
                     fundooContext.NotesData.Update(resNote);
                     fundooContext.SaveChanges();

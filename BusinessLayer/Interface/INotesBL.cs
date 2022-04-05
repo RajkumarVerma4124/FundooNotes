@@ -12,17 +12,17 @@ namespace BusinessLayer.Interface
     /// </summary>
     public interface INotesBL
     {
-        NoteEntity CreateNote(UserNotes userNotes, long userId);
-        GetNotes GetNote(long noteId, long userId);
-        IEnumerable<GetNotes> GetAllNotesByUserId(long userId);
-        IEnumerable<GetNotes> GetAllNotes();
+        NotesResponse CreateNote(UserNotes userNotes, long userId);
+        GetNotesResponse GetNote(long noteId, long userId);
+        IEnumerable<GetNotesResponse> GetAllNotesByUserId(long userId);
+        IEnumerable<GetNotesResponse> GetAllNotes();
         NoteEntity UpdateNote(NoteUpdate noteUpdate, long noteId, long userId);
         string DeleteNote(long noteId, long userId);
         NoteEntity ChangeIsArchieveStatus(long noteId, long userId);
         NoteEntity ChangeIsPinnedStatus(long noteId, long userId);
         NoteEntity ChangeIsTrashStatus(long noteId, long userId);
         NoteEntity ChangeColour(long noteId, long userId, string newColor);
-        NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath);
-        string DeleteImage(long noteId, long userId);
+        IEnumerable<ImageEntity> AddImages(long noteId, long userId, ICollection<IFormFile> imagePath);
+        string DeleteImage(long imageId, long noteId, long userId);
     }
 }

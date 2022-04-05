@@ -24,7 +24,7 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Created Notes Data
-        public NoteEntity CreateNote(UserNotes userNotes, long userId)
+        public NotesResponse CreateNote(UserNotes userNotes, long userId)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public IEnumerable<GetNotes> GetAllNotes()
+        public IEnumerable<GetNotesResponse> GetAllNotes()
         {
             try
             {
@@ -48,7 +48,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public IEnumerable<GetNotes> GetAllNotesByUserId(long userId)
+        public IEnumerable<GetNotesResponse> GetAllNotesByUserId(long userId)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public GetNotes GetNote(long noteId, long userId)
+        public GetNotesResponse GetNote(long noteId, long userId)
         {
             try
             {
@@ -144,11 +144,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public NoteEntity UpdateImage(long noteId, long userId, IFormFile imagePath)
+        public IEnumerable<ImageEntity> AddImages(long noteId, long userId, ICollection<IFormFile> imagePath)
         {
             try
             {
-                return notesRL.UpdateImage(noteId, userId, imagePath);
+                return notesRL.AddImages(noteId, userId, imagePath);
             }
             catch (Exception ex)
             {
@@ -156,11 +156,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public string DeleteImage(long noteId, long userId)
+        public string DeleteImage(long imageId, long noteId, long userId)
         {
             try
             {
-                return notesRL.DeleteImage(noteId, userId);
+                return notesRL.DeleteImage(imageId, noteId, userId);
             }
             catch (Exception ex)
             {

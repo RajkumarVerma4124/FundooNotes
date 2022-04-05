@@ -16,7 +16,6 @@ namespace RepositoryLayer.Migrations
                     Title = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Color = table.Column<string>(nullable: true),
-                    Image = table.Column<string>(nullable: true),
                     Reminder = table.Column<DateTime>(nullable: false),
                     IsArchive = table.Column<bool>(nullable: false),
                     IsPinned = table.Column<bool>(nullable: false),

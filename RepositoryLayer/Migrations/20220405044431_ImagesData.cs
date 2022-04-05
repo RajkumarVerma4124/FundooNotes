@@ -2,7 +2,7 @@
 
 namespace RepositoryLayer.Migrations
 {
-    public partial class ImageEntity : Migration
+    public partial class ImagesData : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -10,7 +10,7 @@ namespace RepositoryLayer.Migrations
                 name: "ImagesData",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    ImageId = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ImageName = table.Column<string>(nullable: true),
                     ImageUrl = table.Column<string>(nullable: true),
@@ -18,7 +18,7 @@ namespace RepositoryLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ImagesData", x => x.Id);
+                    table.PrimaryKey("PK_ImagesData", x => x.ImageId);
                     table.ForeignKey(
                         name: "FK_ImagesData_NotesData_NoteId",
                         column: x => x.NoteId,

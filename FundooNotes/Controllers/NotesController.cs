@@ -238,9 +238,8 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Put Request For Uploading A Image Using Cloudinary (PATCH: /api/notes/uploadimage)
-        [HttpPut("UpdateImage/{noteId}")]
-        public IActionResult UpdateImage(long noteId, IFormFile image)
+        [HttpPost("AddImages/{noteId}")]
+        public IActionResult AddImages(long noteId, ICollection<IFormFile> image)
         {
             try
             {
@@ -248,7 +247,7 @@ namespace FundooNotes.Controllers
                 var userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.UpdateImage(noteId, userId, image);
+                var resNote = this.notesBL.AddImages(noteId, userId, image);
                 if (resNote != null)
                     return this.Ok(new { Success = true, message = "Image Updated Successfully", data = resNote });
                 else
@@ -262,7 +261,7 @@ namespace FundooNotes.Controllers
 
         //Patch Request For Deleting A Image Using Notes Id And Used Id (PATCH: /api/notes/deleteimage)
         [HttpPut("DeleteImage")]
-        public IActionResult DeleteImage(long noteId)
+        public IActionResult DeleteImage(long noteId, long imageId)
         {
             try
             {
@@ -270,7 +269,7 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.DeleteImage(noteId, userId);
+                var resNote = this.notesBL.DeleteImage(imageId, noteId, userId);
                 if (resNote != null)
                     return this.Ok(new { Success = true, message = resNote });
                 else
