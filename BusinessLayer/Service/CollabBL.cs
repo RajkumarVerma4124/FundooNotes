@@ -61,5 +61,18 @@ namespace BusinessLayer.Service
                 throw ex;
             }
         }
+
+        //Method To Return Repo Layer GetCollaborater Method
+        public IEnumerable<CollaboratorEntity> GetNoteCollaborators(long noteId)
+        {
+            try
+            {
+                return colabRL.GetNoteCollaborators(noteId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -78,5 +78,22 @@ namespace RepositoryLayer.Service
                 throw ex;
             }
         }
+
+        //Method To Fetch The Note Collaborators Lists
+        public IEnumerable<CollaboratorEntity> GetNoteCollaborators(long noteId)
+        {
+            try
+            {
+                var collabRes = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId).ToList();
+                if (collabRes.Count() > 0)
+                    return collabRes;
+                else
+                    return null;   
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

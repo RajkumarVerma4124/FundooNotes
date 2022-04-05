@@ -67,5 +67,23 @@ namespace FundooNotes.Controllers
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
+
+        //Get Request For Retrieving List Of Collaborator (Get: /api/collaborator/get)
+        [HttpGet("Get")]
+        public IActionResult GetNoteCollaborators(long noteId)
+        {
+            try
+            {
+                var collabRes = collabBL.GetNoteCollaborators(noteId);
+                if (collabRes != null)
+                    return Ok(new { Success = true, message = "Got The Collaboraters Successfully", data = collabRes });
+                else
+                    return BadRequest(new { Success = false, message = "Collaboraters Not Found", data = collabRes }); 
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
     }
 }
