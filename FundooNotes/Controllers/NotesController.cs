@@ -34,11 +34,11 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var resNote = this.notesBL.CreateNote(userNotes, userId);
+                var resNote = notesBL.CreateNote(userNotes, userId);
                 if (resNote != null)
-                    return this.Ok(new { success = true, message = "Note Created Successfully", data = resNote });
+                    return Ok(new { success = true, message = "Note Created Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { success = false, message = "Note Creation Failed" });
+                    return BadRequest(new { success = false, message = "Note Creation Failed" });
             }
             catch (Exception ex)
             {
@@ -56,11 +56,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (notesId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.GetNote(notesId, userId);
+                var resNote = notesBL.GetNote(notesId, userId);
                 if (resNote != null)
-                    return this.Ok(new { success = true, message = "Got The Note Successfully", data = resNote });
+                    return Ok(new { success = true, message = "Got The Note Successfully", data = resNote });
                 else
-                    return this.NotFound(new { success = false, message = "Note With Given Id Not Found" });
+                    return NotFound(new { success = false, message = "Note With Given Id Not Found" });
             }
             catch (Exception ex)
             {
@@ -76,11 +76,11 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var resNote = this.notesBL.GetAllNotesByUserId(userId);
+                var resNote = notesBL.GetAllNotesByUserId(userId);
                 if (resNote.Count() > 0)
-                    return this.Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
+                    return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
             }
             catch (Exception ex)
             {
@@ -94,11 +94,11 @@ namespace FundooNotes.Controllers
         {
             try
             {
-                var resNote = this.notesBL.GetAllNotes();
+                var resNote = notesBL.GetAllNotes();
                 if (resNote.Count() > 0)
-                    return this.Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
+                    return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
                 else
-                    return this.BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
             }
             catch (Exception ex)
             {
@@ -116,11 +116,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.UpdateNote(noteUpdate, noteId, userId);
+                var resNote = notesBL.UpdateNote(noteUpdate, noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { success = true, message = "Updated The Notes Successfully", data = resNote });
+                    return Ok(new { success = true, message = "Updated The Notes Successfully", data = resNote });
                 else
-                    return this.NotFound(new { success = false, message = "Note With Given Id Not Found For Update" });
+                    return NotFound(new { success = false, message = "Note With Given Id Not Found For Update" });
             }
             catch (Exception ex)
             {
@@ -138,11 +138,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.DeleteNote(noteId, userId);
+                var resNote = notesBL.DeleteNote(noteId, userId);
                 if (string.IsNullOrEmpty(resNote))
-                    return this.Ok(new { success = true, message = resNote});
+                    return Ok(new { success = true, message = resNote});
                 else
-                    return this.NotFound(new { success = false, message = resNote });
+                    return NotFound(new { success = false, message = resNote });
             }
             catch (Exception ex)
             {
@@ -160,11 +160,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.ChangeIsArchieveStatus(noteId, userId);
+                var resNote = notesBL.ChangeIsArchieveStatus(noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                    return Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = "Archive Status Changed Failed" });
+                    return NotFound(new { Success = false, message = "Archive Status Changed Failed" });
             }
             catch (Exception ex)
             {
@@ -182,11 +182,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.ChangeIsPinnedStatus(noteId, userId);
+                var resNote = notesBL.ChangeIsPinnedStatus(noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Pinned Status Changed Successfully", data = resNote });
+                    return Ok(new { Success = true, message = "Pinned Status Changed Successfully", data = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = "Pinned Status Changed Failed" });
+                    return NotFound(new { Success = false, message = "Pinned Status Changed Failed" });
             }
             catch (Exception ex)
             {
@@ -204,11 +204,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.ChangeIsTrashStatus(noteId, userId);
+                var resNote = notesBL.ChangeIsTrashStatus(noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Trash Status Changed Successfully", data = resNote });
+                    return Ok(new { Success = true, message = "Trash Status Changed Successfully", data = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = "Trash Status Changed Failed" });
+                    return NotFound(new { Success = false, message = "Trash Status Changed Failed" });
             }
             catch (Exception ex)
             {
@@ -226,11 +226,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.ChangeColour(noteId, userId, newColor);
+                var resNote = notesBL.ChangeColour(noteId, userId, newColor);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Note Colour Changed successfully ", data = resNote });
+                    return Ok(new { Success = true, message = "Note Colour Changed successfully ", data = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
+                    return NotFound(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
             }
             catch (Exception ex)
             {
@@ -247,11 +247,11 @@ namespace FundooNotes.Controllers
                 var userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.AddImages(noteId, userId, image);
+                var resNote = notesBL.AddImages(noteId, userId, image);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = "Image Updated Successfully", data = resNote });
+                    return Ok(new { Success = true, message = "Image Updated Successfully", data = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = "Image Updated Failed " });
+                    return NotFound(new { Success = false, message = "Image Updated Failed " });
             }
             catch (Exception ex)
             {
@@ -269,11 +269,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
-                var resNote = this.notesBL.DeleteImage(imageId, noteId, userId);
+                var resNote = notesBL.DeleteImage(imageId, noteId, userId);
                 if (resNote != null)
-                    return this.Ok(new { Success = true, message = resNote });
+                    return Ok(new { Success = true, message = resNote });
                 else
-                    return this.NotFound(new { Success = false, message = resNote });
+                    return NotFound(new { Success = false, message = resNote });
             }
             catch (Exception ex)
             {
