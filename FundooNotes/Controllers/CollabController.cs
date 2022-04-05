@@ -29,6 +29,9 @@ namespace FundooNotes.Controllers
         {
             try
             {
+                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId);
+                if (ifEmailExist)
+                    return Ok(new { success = false, message = "The Email Already Exists" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var collabRes = collabBL.AddCollaborator(notesCollab, userId);
@@ -36,6 +39,28 @@ namespace FundooNotes.Controllers
                     return Ok(new { Success = true, message = "Collaborator Added Successfully", data = collabRes });
                 else
                     return BadRequest(new { Success = false, message = "Collab Creation Failed" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Delete Request For Deleting A Collaborator (Delete: /api/collaborator/delete)
+        [HttpDelete("Delete")]
+        public IActionResult DeleteCollaborator(long collabId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                if (collabId <= 0)
+                    return BadRequest(new { success = false, message = "Collab Id Should Be Greater Than Zero" });
+                var collabRes = collabBL.DeleteCollaborator(collabId, userId);
+                if (collabRes != null)
+                    return Ok(new { Success = true,  message = collabRes });
+                else
+                    return BadRequest(new { Success = false, message = collabRes });
             }
             catch (Exception ex)
             {

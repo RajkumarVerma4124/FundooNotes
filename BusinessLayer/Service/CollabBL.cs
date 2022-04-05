@@ -22,11 +22,39 @@ namespace BusinessLayer.Service
             this.colabRL = colabRL;
         }
 
+        //Method To Return Repo Layer EmailExist Method
+
+        public bool IsEmailIdExist(string emailId, long noteId)
+        {
+            try
+            {
+                return colabRL.IsEmailIdExist(emailId, noteId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Return Repo Layer AddCollaborater Method
         public CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId)
         {
             try
             {
                 return colabRL.AddCollaborator(notesCollab, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Return Repo Layer DeleteCollaborater Method
+        public string DeleteCollaborator(long collabId, long userId)
+        {
+            try
+            {
+                return colabRL.DeleteCollaborator(collabId, userId);
             }
             catch (Exception ex)
             {

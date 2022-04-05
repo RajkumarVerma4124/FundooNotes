@@ -11,6 +11,8 @@ namespace RepositoryLayer.Interface
     /// </summary>
     public interface ICollabRL
     {
+        bool IsEmailIdExist(string emailId, long noteId);
         CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId);
+        string DeleteCollaborator(long collabId, long userId);
     }
 }

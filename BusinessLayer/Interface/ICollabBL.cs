@@ -11,6 +11,8 @@ namespace BusinessLayer.Interface
     /// </summary>
     public interface ICollabBL
     {
+        bool IsEmailIdExist(string emailId, long noteId);
         CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId);
+        string DeleteCollaborator(long collabId, long userId);
     }
 }

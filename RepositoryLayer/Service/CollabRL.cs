@@ -23,7 +23,14 @@ namespace RepositoryLayer.Service
             this.fundooContext = fundooContext;
         }
 
-        //Method To Add The Collaborator Using Note Id And UserId
+        //Method to check if current email id provided by user is exist in Collab table or not;
+        public bool IsEmailIdExist(string emailId, long noteId)
+        {
+            var emailIds = fundooContext.CollaboratorData.Where(e => e.CollabEmail == emailId && e.NoteId == noteId).Count();
+            return emailIds > 0;
+        }
+
+        //Method To Fetch The Notes And Add The Collaborator Using Note Id And UserId
         public CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId)
         {
             try
@@ -44,6 +51,27 @@ namespace RepositoryLayer.Service
                 }
                 else
                     return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch And Delete The Collaborator Using Note Id And UserId
+        public string DeleteCollaborator(long collabId, long userId)
+        {
+            try
+            {
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(c=> c.CollabId == collabId && c.UserId == userId);
+                if (collabRes != null)
+                { 
+                    fundooContext.CollaboratorData.Remove(collabRes);
+                    var result = fundooContext.SaveChanges();
+                    return "Collaborater Deleted Succesfully";
+                }
+                else
+                    return "Collaborater Deletion Failed";
             }
             catch (Exception ex)
             {
