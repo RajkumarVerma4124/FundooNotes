@@ -77,7 +77,7 @@ namespace RepositoryLayer.Migrations
                     b.Property<string>("LabelName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("NoteId")
+                    b.Property<long?>("NoteId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
@@ -188,9 +188,7 @@ namespace RepositoryLayer.Migrations
                 {
                     b.HasOne("RepositoryLayer.Entity.NoteEntity", "Note")
                         .WithMany()
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NoteId");
 
                     b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
                         .WithMany()

@@ -23,7 +23,7 @@ namespace RepositoryLayer.Entity
         public virtual UserEntity User { get; set; }
 
         [ForeignKey("Note")]
-        public long NoteId { get; set; }
+        public long? NoteId { get; set; }
 
         [JsonIgnore]
         public virtual NoteEntity Note { get; set; }

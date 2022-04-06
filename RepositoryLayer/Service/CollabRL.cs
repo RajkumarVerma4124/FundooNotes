@@ -55,7 +55,10 @@ namespace RepositoryLayer.Service
                     };
                     fundooContext.CollaboratorData.Add(collaboratorEntity);
                     var result = fundooContext.SaveChanges();
-                    return collaboratorEntity;
+                    if(result > 0)
+                        return collaboratorEntity;
+                    else
+                    return null;
                 }
                 else
                     return null;
@@ -83,7 +86,10 @@ namespace RepositoryLayer.Service
                     {
                         fundooContext.CollaboratorData.Remove(collabRes);
                         var result = fundooContext.SaveChanges();
-                        return "Collaborater Deleted Succesfully";
+                        if (result > 0)
+                            return "Collaborater Deleted Succesfully";
+                        else
+                            return null;
                     }    
                     else
                         return "You Cant Remove The Owner Of This Note";

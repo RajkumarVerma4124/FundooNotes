@@ -22,11 +22,11 @@ namespace BusinessLayer.Service
             this.labelRL = labelRL;
         }
 
-        public bool IsLabelExist(string labelName, long noteId)
+        public bool IsLabelExist(string labelName)
         {
             try
             {
-                return labelRL.IsLabelExist(labelName, noteId);
+                return labelRL.IsLabelExist(labelName);
             }
             catch (Exception ex)
             {
@@ -34,11 +34,60 @@ namespace BusinessLayer.Service
             }
         }
 
-        public LabelsEntity CreateLabel(NotesLabel notesLabel, long userId)
+        public bool IsLabelInNoteExist(string labelName, long noteId)
         {
             try
             {
-                return labelRL.CreateLabel(notesLabel, userId);
+                return labelRL.IsLabelInNoteExist(labelName, noteId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public LabelsEntity CreateNoteLabel(NotesLabel notesLabel, long userId)
+        {
+            try
+            {
+                return labelRL.CreateNoteLabel(notesLabel, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public LabelsEntity AddLabelToNote(long labelId, long noteId, long userId)
+
+        {
+            try
+            {
+                return labelRL.AddLabelToNote(labelId, noteId, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public LabelsEntity EditLabel(string newLabelName, long userId, long labelId)
+        {
+            try
+            {
+                return labelRL.EditLabel(newLabelName, userId, labelId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public LabelsEntity CreateNewLabel(string labelName, long userId)
+        {
+            try
+            {
+                return labelRL.CreateNewLabel(labelName, userId);
             }
             catch (Exception ex)
             {

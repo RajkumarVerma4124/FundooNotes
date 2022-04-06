@@ -10,8 +10,8 @@ using RepositoryLayer.Context;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(FundooContext))]
-    [Migration("20220406033705_LabelData")]
-    partial class LabelData
+    [Migration("20220406060802_LabelsData")]
+    partial class LabelsData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -79,7 +79,7 @@ namespace RepositoryLayer.Migrations
                     b.Property<string>("LabelName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("NoteId")
+                    b.Property<long?>("NoteId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
@@ -190,9 +190,7 @@ namespace RepositoryLayer.Migrations
                 {
                     b.HasOne("RepositoryLayer.Entity.NoteEntity", "Note")
                         .WithMany()
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NoteId");
 
                     b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
                         .WithMany()

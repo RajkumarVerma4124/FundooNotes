@@ -11,7 +11,11 @@ namespace BusinessLayer.Interface
     /// </summary>
     public interface ILabelBL
     {
-        bool IsLabelExist(string labelName, long noteId);
-        LabelsEntity CreateLabel(NotesLabel notesLabel, long userId);
+        bool IsLabelExist(string labelName);
+        bool IsLabelInNoteExist(string labelName, long noteId);
+        LabelsEntity CreateNoteLabel(NotesLabel notesLabel, long userId);
+        LabelsEntity CreateNewLabel(string labelName, long userId);
+        LabelsEntity AddLabelToNote(long labelId, long noteId, long userId);
+        LabelsEntity EditLabel(string newLabelName, long userId, long labelId);
     }
 }

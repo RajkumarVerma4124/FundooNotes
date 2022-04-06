@@ -2,7 +2,7 @@
 
 namespace RepositoryLayer.Migrations
 {
-    public partial class LabelData : Migration
+    public partial class LabelsData : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +14,7 @@ namespace RepositoryLayer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LabelName = table.Column<string>(nullable: true),
                     UserId = table.Column<long>(nullable: false),
-                    NoteId = table.Column<long>(nullable: false)
+                    NoteId = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -24,13 +24,13 @@ namespace RepositoryLayer.Migrations
                         column: x => x.NoteId,
                         principalTable: "NotesData",
                         principalColumn: "NoteId",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_LabelsData_UserData_UserId",
                         column: x => x.UserId,
                         principalTable: "UserData",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
