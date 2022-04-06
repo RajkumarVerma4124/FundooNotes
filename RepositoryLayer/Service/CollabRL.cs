@@ -24,7 +24,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method to check if current email id provided by user is exist in Collab table or not;
-        public bool IsEmailIdExist(string emailId, long noteId, long userId)
+        public bool IsEmailIdExist(string emailId, long noteId)
         {
             try
             {

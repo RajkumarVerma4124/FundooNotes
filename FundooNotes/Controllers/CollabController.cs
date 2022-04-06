@@ -31,7 +31,7 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId, userId);
+                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId);
                 if (ifEmailExist)
                     return Ok(new { success = false, message = "The Email Already Exists" });
                 var collabRes = collabBL.AddCollaborator(notesCollab, userId);

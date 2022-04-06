@@ -9,9 +9,9 @@ using System.Text;
 namespace BusinessLayer.Service
 {
     /// <summary>
-    /// Created The Notes Business Layer Class To Implement IColabBL Methods
+    /// Created The Collab Business Layer Class To Implement IColabBL Methods
     /// </summary>
-    public class CollabBL: ICollabBL
+    public class CollabBL : ICollabBL
     {
         //Reference Object For Interface IUserRL
         private readonly ICollabRL colabRL;
@@ -24,11 +24,11 @@ namespace BusinessLayer.Service
 
         //Method To Return Repo Layer EmailExist Method
 
-        public bool IsEmailIdExist(string emailId, long noteId, long userId)
+        public bool IsEmailIdExist(string emailId, long noteId)
         {
             try
             {
-                return colabRL.IsEmailIdExist(emailId, noteId, userId);
+                return colabRL.IsEmailIdExist(emailId, noteId);
             }
             catch (Exception ex)
             {
