@@ -106,6 +106,26 @@ namespace FundooNotes.Controllers
             }
         }
 
+        //Get Request For Retreiving A Multiple Notes For Particular Labels (GET: /api/notes/getlabels)
+        [HttpGet("GetLabels")]
+        public IActionResult GetNotesByLabelName(string labelName)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var resNote = notesBL.GetNotesByLabelName(labelName);
+                if (resNote != null)
+                    return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
+                else
+                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
         //Put Request For Updating A Particular Notes For Particular User Id (PUT: /api/notes/updatenote)
         [HttpPut("Update")]
         public IActionResult UpdateNote(NoteUpdate noteUpdate, long noteId)

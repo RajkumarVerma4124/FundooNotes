@@ -122,7 +122,6 @@ namespace RepositoryLayer.Service
             {
                 IEnumerable<ImageEntity> imageList = null;
                 IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
-                IList<NoteEntity> resultNotesList = new List<NoteEntity>();
                 List<NoteEntity> resNotesList = new List<NoteEntity>();
                 NoteEntity noteRes = null;
                 var collabList = fundooContext.CollaboratorData.Where(n => n.UserId == userId).ToList();
@@ -174,6 +173,56 @@ namespace RepositoryLayer.Service
                 IEnumerable<ImageEntity> imageList = null;
                 IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
                 var resNotesList = fundooContext.NotesData.ToList();
+                if (resNotesList.Count() > 0)
+                {
+                    foreach (var resultNote in resNotesList)
+                    {
+                        imageList = fundooContext.ImagesData.Where(n => n.NoteId == resultNote.NoteId).ToList();
+                        GetNotesResponse note = new GetNotesResponse
+                        {
+                            NotesId = resultNote.NoteId,
+                            Title = resultNote.Title,
+                            Description = resultNote.Description,
+                            Color = resultNote.Color,
+                            IsArchive = resultNote.IsArchive,
+                            IsTrash = resultNote.IsTrash,
+                            IsPinned = resultNote.IsPinned,
+                            Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            ImageList = imageList
+                        };
+                        noteList.Add(note);
+                    }
+                    return noteList;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch Multiple Notes Details From DB Using Label Name
+        public IEnumerable<GetNotesResponse> GetNotesByLabelName(string labelName)
+        {
+            try
+            {
+                IEnumerable<ImageEntity> imageList = null;
+                IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
+                List<NoteEntity> resNotesList = new List<NoteEntity>();
+                NoteEntity noteRes = null;
+                var labelsList = fundooContext.LabelsData.Where(l => l.LabelName == labelName).ToList();
+                if (labelsList.Count() > 0)
+                {
+                    foreach (var labels in labelsList)
+                    {
+                        noteRes = fundooContext.NotesData.Where(n => n.NoteId == labels.NoteId).FirstOrDefault();
+                        resNotesList.Add(noteRes);
+                    }
+                }
                 if (resNotesList.Count() > 0)
                 {
                     foreach (var resultNote in resNotesList)

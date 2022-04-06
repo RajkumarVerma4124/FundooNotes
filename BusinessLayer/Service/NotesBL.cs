@@ -167,5 +167,17 @@ namespace BusinessLayer.Service
                 throw ex;
             }
         }
+
+        public IEnumerable<GetNotesResponse> GetNotesByLabelName(string labelName)
+        {
+            try
+            {
+                return notesRL.GetNotesByLabelName(labelName);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
