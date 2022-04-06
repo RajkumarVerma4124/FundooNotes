@@ -81,9 +81,14 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resultNote = fundooContext.NotesData.Where(n => n.UserId == userId && n.NoteId == noteId).FirstOrDefault();
+                NoteEntity resultNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resultNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resultNote = fundooContext.NotesData.Where(n => n.UserId == userId && n.NoteId == noteId).FirstOrDefault();
                 var imageList = fundooContext.ImagesData.Where(n => n.NoteId == noteId).ToList();
-                if (resultNote != null)
+                if (resultNote != null || collabRes != null)
                 {
                     GetNotesResponse resNote = new GetNotesResponse
                     {
@@ -117,7 +122,18 @@ namespace RepositoryLayer.Service
             {
                 IEnumerable<ImageEntity> imageList = null;
                 IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
-                var resNotesList = fundooContext.NotesData.Where(n => n.UserId == userId).ToList();
+                IList<NoteEntity> resultNotesList = new List<NoteEntity>();
+                List<NoteEntity> resNotesList = new List<NoteEntity>();
+                NoteEntity noteRes = null;
+                var collabList = fundooContext.CollaboratorData.Where(n => n.UserId == userId).ToList();
+                if (collabList.Count() > 0)
+                {
+                    foreach (var collab in collabList)
+                    {
+                        noteRes = fundooContext.NotesData.Where(n => n.NoteId == collab.NoteId).FirstOrDefault();
+                        resNotesList.Add(noteRes);
+                    }
+                }
                 if (resNotesList.Count() > 0) 
                 { 
                     foreach (var resultNote in resNotesList)
@@ -195,16 +211,17 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                NoteEntity resNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ?  resNote.Title : noteUpdate.Title;
                     resNote.Description = string.IsNullOrEmpty(noteUpdate.Description) ? resNote.Description : noteUpdate.Description;
                     resNote.Reminder = noteUpdate.Reminder.CompareTo(resNote.Reminder) == 0 ? resNote.Reminder : noteUpdate.Reminder;
-                    resNote.Color = string.IsNullOrEmpty(noteUpdate.Color) ? resNote.Color : noteUpdate.Color;
-                    resNote.IsTrash = noteUpdate.IsTrash.CompareTo(resNote.IsTrash) == 0 ? resNote.IsTrash : noteUpdate.IsTrash;
-                    resNote.IsArchive = noteUpdate.IsArchive.CompareTo(resNote.IsArchive) == 0 ? resNote.IsArchive : noteUpdate.IsArchive;
-                    resNote.IsPinned = noteUpdate.IsPinned.CompareTo(resNote.IsPinned) == 0 ? resNote.IsPinned : noteUpdate.IsPinned;
                     resNote.ModifiedAt = DateTime.Now;
 
                     // Updating And Saving The Changes In The Database For Given NoteId.
@@ -248,7 +265,12 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                NoteEntity resNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     if (resNote.IsArchive == false)
@@ -272,7 +294,12 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();  
+                NoteEntity resNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();  
                 if (resNote != null)
                 {
                     if (resNote.IsPinned == false)
@@ -320,7 +347,12 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                NoteEntity resNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     resNote.Color = newColor;
@@ -364,7 +396,12 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                NoteEntity resNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     IList<ImageEntity> images = new List<ImageEntity>();
@@ -400,7 +437,12 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                var resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
+                NoteEntity resNote = null;
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
+                if (collabRes != null)
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
+                else
+                    resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 var imageRes = this.fundooContext.ImagesData.Where(n => n.ImageId == imageId).FirstOrDefault();
                 if (resNote != null && imageRes != null)
                 {

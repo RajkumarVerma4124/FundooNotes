@@ -24,10 +24,18 @@ namespace RepositoryLayer.Service
         }
 
         //Method to check if current email id provided by user is exist in Collab table or not;
-        public bool IsEmailIdExist(string emailId, long noteId)
+        public bool IsEmailIdExist(string emailId, long noteId, long userId)
         {
-            var emailIds = fundooContext.CollaboratorData.Where(e => e.CollabEmail == emailId && e.NoteId == noteId).Count();
-            return emailIds > 0;
+            try
+            {
+                //Condition For Checking Collaborator Email If Its Exist Or Not
+                var emailIdCount = fundooContext.CollaboratorData.Where(e => e.CollabEmail == emailId && e.NoteId == noteId).Count();
+                return emailIdCount > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            } 
         }
 
         //Method To Fetch The Notes And Add The Collaborator Using Note Id And UserId
@@ -43,7 +51,7 @@ namespace RepositoryLayer.Service
                     {
                         CollabEmail = notesCollab.CollabEmail,
                         NoteId = notesCollab.NoteId,
-                        UserId = userId
+                        UserId = userDetails.UserId
                     };
                     fundooContext.CollaboratorData.Add(collaboratorEntity);
                     var result = fundooContext.SaveChanges();
@@ -59,16 +67,26 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch And Delete The Collaborator Using Note Id And UserId
-        public string DeleteCollaborator(long collabId, long userId)
+        public string DeleteCollaborator(long collabId, long notesId, long userId)
         {
             try
             {
-                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(c=> c.CollabId == collabId && c.UserId == userId);
+                var collabRes = fundooContext.CollaboratorData.FirstOrDefault(c => c.CollabId == collabId && c.NoteId == notesId);
                 if (collabRes != null)
-                { 
-                    fundooContext.CollaboratorData.Remove(collabRes);
-                    var result = fundooContext.SaveChanges();
-                    return "Collaborater Deleted Succesfully";
+                {
+                    var collabOwner = fundooContext.NotesData.FirstOrDefault(c => c.NoteId == notesId);
+                    if(collabOwner.UserId == collabRes.UserId && collabOwner.NoteId == collabRes.NoteId)
+                    {
+                        return "You Cant Remove The Owner Of Collaborator";
+                    }
+                    else if(collabOwner.UserId != collabRes.UserId)
+                    {
+                        fundooContext.CollaboratorData.Remove(collabRes);
+                        var result = fundooContext.SaveChanges();
+                        return "Collaborater Deleted Succesfully";
+                    }    
+                    else
+                        return "You Cant Remove The Owner Of This Note";
                 }
                 else
                     return "Collaborater Deletion Failed";
@@ -80,15 +98,21 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Note Collaborators Lists
-        public IEnumerable<CollaboratorEntity> GetNoteCollaborators(long noteId)
+        public IEnumerable<CollaboratorEntity> GetNoteCollaborators(long noteId, long userId)
         {
             try
             {
-                var collabRes = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId).ToList();
-                if (collabRes.Count() > 0)
-                    return collabRes;
+                var iscollabExist = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId && c.UserId == userId).ToList();
+                if (iscollabExist.Count() > 0)
+                {
+                    var collabRes = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId).ToList();
+                    if (collabRes.Count() > 0)
+                        return collabRes;
+                    else
+                        return null;
+                }
                 else
-                    return null;   
+                    return null;            
             }
             catch (Exception ex)
             {

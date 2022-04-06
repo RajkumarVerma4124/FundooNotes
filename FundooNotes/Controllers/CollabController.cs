@@ -29,11 +29,11 @@ namespace FundooNotes.Controllers
         {
             try
             {
-                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId);
-                if (ifEmailExist)
-                    return Ok(new { success = false, message = "The Email Already Exists" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId, userId);
+                if (ifEmailExist)
+                    return Ok(new { success = false, message = "The Email Already Exists" });
                 var collabRes = collabBL.AddCollaborator(notesCollab, userId);
                 if (collabRes != null)
                     return Ok(new { Success = true, message = "Collaborator Added Successfully", data = collabRes });
@@ -48,7 +48,7 @@ namespace FundooNotes.Controllers
 
         //Delete Request For Deleting A Collaborator (Delete: /api/collaborator/delete)
         [HttpDelete("Delete")]
-        public IActionResult DeleteCollaborator(long collabId)
+        public IActionResult DeleteCollaborator(long collabId, long noteId)
         {
             try
             {
@@ -56,11 +56,11 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (collabId <= 0)
                     return BadRequest(new { success = false, message = "Collab Id Should Be Greater Than Zero" });
-                var collabRes = collabBL.DeleteCollaborator(collabId, userId);
-                if (collabRes != null)
+                var collabRes = collabBL.DeleteCollaborator(collabId, noteId, userId);
+                if (!collabRes.Contains("Remove"))
                     return Ok(new { Success = true,  message = collabRes });
                 else
-                    return BadRequest(new { Success = false, message = collabRes });
+                    return Unauthorized(new { Success = false, message = collabRes });
             }
             catch (Exception ex)
             {
@@ -74,11 +74,15 @@ namespace FundooNotes.Controllers
         {
             try
             {
-                var collabRes = collabBL.GetNoteCollaborators(noteId);
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var collabRes = collabBL.GetNoteCollaborators(noteId, userId);
                 if (collabRes != null)
                     return Ok(new { Success = true, message = "Got The Collaboraters Successfully", data = collabRes });
                 else
-                    return BadRequest(new { Success = false, message = "Collaboraters Not Found", data = collabRes }); 
+                    return Unauthorized(new { Success = false, message = "You Dont Have Access To Those Notes", data = collabRes }); 
             }
             catch (Exception ex)
             {
