@@ -139,7 +139,7 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes And Edit The Label Using Note Id And UserId
+        //Method To Fetch The Labels And Edit The Label Using label Id And UserId
         public LabelsEntity EditLabel(string newLabelName, long userId, long labelId)
         {
             try
@@ -156,6 +156,54 @@ namespace RepositoryLayer.Service
                 }
                 else
                     return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch And Remove The Labels Using Label Id And UserId
+        public string RemoveLabel (long labelId, long userId)
+        {
+            try
+            {
+                var labelDetails = fundooContext.LabelsData.Where(l => l.LabelId == labelId && l.UserId == userId).FirstOrDefault();
+                if (labelDetails != null)
+                {
+                    fundooContext.LabelsData.Remove(labelDetails);
+                    var result = fundooContext.SaveChanges();
+                    if (result > 0)
+                        return "Label Removed Succesfully";
+                    else
+                        return "Removal Of Label Failed";
+                }
+                else
+                    return "Label Not Found";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch And Delete The Labels Using Label Name And UserId
+        public string DeleteLabel(string labelName, long userId)
+        {
+            try
+            {
+                var labelDetails = fundooContext.LabelsData.Where(l => l.LabelName == labelName && l.UserId == userId).ToList();
+                if (labelDetails != null)
+                {
+                    fundooContext.LabelsData.RemoveRange(labelDetails);
+                    var result = fundooContext.SaveChanges();
+                    if (result > 0)
+                        return "Label Deleted Succesfully";
+                    else
+                        return "Label Deletion Failed";
+                }
+                else
+                    return "Label Not Found";
             }
             catch (Exception ex)
             {

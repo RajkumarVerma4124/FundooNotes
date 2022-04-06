@@ -94,5 +94,29 @@ namespace BusinessLayer.Service
                 throw ex;
             }
         }
+
+        public string RemoveLabel(long labelId, long userId)
+        {
+            try
+            {
+                return labelRL.RemoveLabel(labelId, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public string DeleteLabel(string labelName, long userId)
+        {
+            try
+            {
+                return labelRL.DeleteLabel(labelName, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -17,5 +17,7 @@ namespace RepositoryLayer.Interface
         LabelsEntity CreateNewLabel(string labelName, long userId);
         LabelsEntity AddLabelToNote(long labelId, long noteId, long userId);
         LabelsEntity EditLabel(string newLabelName, long userId, long labelId);
+        string RemoveLabel(long labelId, long userId);
+        string DeleteLabel(string labelName, long userId);
     }
 }

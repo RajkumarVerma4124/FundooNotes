@@ -33,9 +33,9 @@ namespace FundooNotes.Controllers
                 var ifLabelExist = labelBL.IsLabelInNoteExist(notesLabel.LabelName, notesLabel.NoteId);
                 if (ifLabelExist)
                     return Ok(new { success = false, message = "The Label Already Exists" });
-                var collabRes = labelBL.CreateNoteLabel(notesLabel, userId);
-                if (collabRes != null)
-                    return Ok(new { Success = true, message = "Label Added In Note Successfully", data = collabRes });
+                var labelRes = labelBL.CreateNoteLabel(notesLabel, userId);
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Label Added In Note Successfully", data = labelRes });
                 else
                     return BadRequest(new { Success = false, message = "Label Creation Failed" });
             }
@@ -56,9 +56,9 @@ namespace FundooNotes.Controllers
                 var ifLabelExist = labelBL.IsLabelExist(labelName);
                 if (ifLabelExist)
                     return Ok(new { success = false, message = "The Label Already Exists" });
-                var collabRes = labelBL.CreateNewLabel(labelName, userId);
-                if (collabRes != null)
-                    return Ok(new { Success = true, message = "Label Created Successfully", data = collabRes });
+                var labelRes = labelBL.CreateNewLabel(labelName, userId);
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Label Created Successfully", data = labelRes });
                 else
                     return BadRequest(new { Success = false, message = "Label Creation Failed" });
             }
@@ -76,9 +76,9 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var collabRes = labelBL.AddLabelToNote(labelId, noteId, userId);
-                if (collabRes != null)
-                    return Ok(new { Success = true, message = "Label Added To Note Successfully", data = collabRes });
+                var labelRes = labelBL.AddLabelToNote(labelId, noteId, userId);
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Label Added To Note Successfully", data = labelRes });
                 else
                     return BadRequest(new { Success = false, message = "Label Addition To Note Failed" });
             }
@@ -96,11 +96,51 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var collabRes = labelBL.EditLabel(newLableName, userId, labelId); ;
-                if (collabRes != null)
-                    return Ok(new { Success = true, message = "Label Edited Successfully", data = collabRes });
+                var labelRes = labelBL.EditLabel(newLableName, userId, labelId); ;
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Label Edited Successfully", data = labelRes });
                 else
                     return BadRequest(new { Success = false, message = "Label Creation Failed" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Delete Request For Removing A Label From Particular Note(Delete: /api/label/remove)
+        [HttpDelete("Remove")]
+        public IActionResult RemoveLabel(long labelId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var labelRes = labelBL.RemoveLabel(labelId, userId);
+                if (labelRes.Contains("Removed"))
+                    return Ok(new { Success = true, message = labelRes });
+                else
+                    return Unauthorized(new { Success = false, message = labelRes });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Delete Request For Deleting A Label (Delete: /api/label/delete)
+        [HttpDelete("Delete")]
+        public IActionResult DeleteLabel(string labelName)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var labelRes = labelBL.DeleteLabel(labelName, userId);
+                if (labelRes.Contains("Deleted"))
+                    return Ok(new { Success = true, message = labelRes });
+                else
+                    return BadRequest(new { Success = false, message = labelRes });
             }
             catch (Exception ex)
             {
