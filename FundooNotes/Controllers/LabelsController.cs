@@ -22,7 +22,7 @@ namespace FundooNotes.Controllers
             this.labelBL = labelBL;
         }
 
-        //Post Request For Creating A New Label (POST: /api/Label/create)
+        //Post Request For Creating A New Label (POST: /api/labels/create)
         [HttpPost("CreateNote")]
         public IActionResult CreateNoteLabel(NotesLabel notesLabel)
         {
@@ -45,7 +45,7 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Post Request For Creating A New Label (POST: /api/Label/create)
+        //Post Request For Creating A New Label (POST: /api/labels/create)
         [HttpPost("Create")]
         public IActionResult CreateNewLabel(string labelName)
         {
@@ -68,12 +68,14 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Patch Request For Creating A New Label For Particular Note (POST: /api/Label/AddToNote)
+        //Patch Request For Creating A New Label For Particular Note (POST: /api/labels/AddToNote)
         [HttpPatch("AddToNote")]
         public IActionResult AddLabelToNote(long labelId, long noteId)
         {
             try
             {
+                if (labelId <= 0 && noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Or Label Id Should Be Greater Than Zero" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var labelRes = labelBL.AddLabelToNote(labelId, noteId, userId);
@@ -88,12 +90,14 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Patch Request For Editing The Label For Particular Note (PATCH: /api/Label/Edit)
+        //Patch Request For Editing The Label For Particular Note (PATCH: /api/labels/Edit)
         [HttpPatch("Edit")]
         public IActionResult EditLabel(string newLableName, long labelId)
         {
             try
             {
+                if (labelId <= 0)
+                    return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var labelRes = labelBL.EditLabel(newLableName, userId, labelId); ;
@@ -108,12 +112,14 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Delete Request For Removing A Label From Particular Note(Delete: /api/label/remove)
+        //Delete Request For Removing A Label From Particular Note(Delete: /api/labels/remove)
         [HttpDelete("Remove")]
         public IActionResult RemoveLabel(long labelId)
         {
             try
             {
+                if (labelId <= 0)
+                    return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var labelRes = labelBL.RemoveLabel(labelId, userId);
@@ -128,7 +134,7 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Delete Request For Deleting A Label (Delete: /api/label/delete)
+        //Delete Request For Deleting A Label (Delete: /api/labels/delete)
         [HttpDelete("Delete")]
         public IActionResult DeleteLabel(string labelName)
         {
@@ -141,6 +147,48 @@ namespace FundooNotes.Controllers
                     return Ok(new { Success = true, message = labelRes });
                 else
                     return BadRequest(new { Success = false, message = labelRes });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Get Request For Retrieving List Of Notes Labels (Get: /api/labels/get)
+        [HttpGet("Get")]
+        public IActionResult GetNoteLabels(long noteId)
+        {
+            try
+            {
+                if (noteId <= 0)
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var labelRes = labelBL.GetNotesLabels(noteId, userId);
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Got The Notes Label Successfully", data = labelRes });
+                else
+                    return Unauthorized(new { Success = false, message = "Notes Label Retreival Failed", data = labelRes });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
+        [HttpGet("GetAll")]
+        public IActionResult GetLabelsList()
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var labelRes = labelBL.GetLabelsList(userId);
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Got The Label Successfully", data = labelRes });
+                else
+                    return Unauthorized(new { Success = false, message = "Label Retreival Failed", data = labelRes });
             }
             catch (Exception ex)
             {

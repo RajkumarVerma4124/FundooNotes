@@ -210,5 +210,40 @@ namespace RepositoryLayer.Service
                 throw ex;
             }
         }
+
+        //Method To Fetch The Lables Lists
+        public IEnumerable<LabelsEntity> GetNotesLabels(long noteId, long userId)
+        {
+            try
+            {
+                var labelsList = fundooContext.LabelsData.Where(c => c.NoteId == noteId && c.UserId == userId).ToList();
+                if (labelsList.Count() > 0)
+                    return labelsList;
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Lables Lists
+        public IEnumerable<LabelsEntity> GetLabelsList(long userId)
+        {
+            try
+            {
+                var notesList = fundooContext.NotesData.Where(u => u.UserId == userId).ToList();
+                var labelsList = fundooContext.LabelsData.Where(l => l.UserId == userId).ToList();
+                if (labelsList.Count() > 0)
+                    return labelsList;
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
