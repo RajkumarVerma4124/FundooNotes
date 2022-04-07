@@ -11,15 +11,14 @@ namespace RepositoryLayer.Interface
     /// </summary>
     public interface ILabelRL
     {
-        bool IsLabelExist(string labelName);
-        bool IsLabelInNoteExist(string labelName, long noteId);
-        LabelsEntity CreateNoteLabel(NotesLabel notesLabel, long userId);
-        LabelsEntity CreateNewLabel(string labelName, long userId);
-        LabelsEntity AddLabelToNote(long labelId, long noteId, long userId);
-        LabelsEntity EditLabel(string newLabelName, long userId, long labelId);
-        string RemoveLabel(long labelId, long userId);
-        string DeleteLabel(string labelName, long userId);
-        IEnumerable<LabelsEntity> GetNotesLabels(long noteId, long userId);
-        IEnumerable<LabelsEntity> GetLabelsList(long userId);
+        bool IsLabelExist(string labelName, long userId);
+        LabelNameEntity CreateNewLabel(string labelName, long userId);
+        LabelsEntity AddNoteLabel(NotesLabel notesLabel, long userId);
+        LabelNameEntity EditLabel(string newLabelName, long userId, long labelNameId);
+        string RemoveLabel(long labelId, long noteId, long userId);
+        string DeleteLabel(long labelNameId, long userId);
+        IEnumerable<LabelsResponse> GetNotesLabels(long noteId, long userId);
+        IEnumerable<LabelsResponse> GetUsersLabelsList(long userId);
+        IEnumerable<LabelNameEntity> GetUsersLabelNamesList(long userId);
     }
 }

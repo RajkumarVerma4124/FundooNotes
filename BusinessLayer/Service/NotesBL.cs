@@ -168,11 +168,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public IEnumerable<GetNotesResponse> GetNotesByLabelName(string labelName)
+        public IEnumerable<GetNotesResponse> GetNotesByLabelId(long labelId)
         {
             try
             {
-                return notesRL.GetNotesByLabelName(labelName);
+                return notesRL.GetNotesByLabelId(labelId);
             }
             catch (Exception ex)
             {

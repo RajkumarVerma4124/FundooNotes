@@ -117,13 +117,13 @@ namespace FundooNotes.Controllers
 
         //Get Request For Retreiving A Multiple Notes For Particular Labels (GET: /api/notes/getlabels)
         [HttpGet("GetLabels")]
-        public IActionResult GetNotesByLabelName(string labelName)
+        public IActionResult GetNotesByLabelId(long labelId)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var resNote = notesBL.GetNotesByLabelName(labelName);
+                var resNote = notesBL.GetNotesByLabelId(labelId);
                 if (resNote != null)
                     return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
                 else

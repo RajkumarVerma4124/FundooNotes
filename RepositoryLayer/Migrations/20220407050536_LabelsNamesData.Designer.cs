@@ -10,8 +10,8 @@ using RepositoryLayer.Context;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(FundooContext))]
-    [Migration("20220406060802_LabelsData")]
-    partial class LabelsData
+    [Migration("20220407050536_LabelsNamesData")]
+    partial class LabelsNamesData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -69,9 +69,9 @@ namespace RepositoryLayer.Migrations
                     b.ToTable("ImagesData");
                 });
 
-            modelBuilder.Entity("RepositoryLayer.Entity.LabelsEntity", b =>
+            modelBuilder.Entity("RepositoryLayer.Entity.LabelNameEntity", b =>
                 {
-                    b.Property<long>("LabelId")
+                    b.Property<long>("LabelNameId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -79,19 +79,12 @@ namespace RepositoryLayer.Migrations
                     b.Property<string>("LabelName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("NoteId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("LabelId");
+                    b.HasKey("LabelNameId");
 
-                    b.HasIndex("NoteId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LabelsData");
+                    b.ToTable("LabelsNameData");
                 });
 
             modelBuilder.Entity("RepositoryLayer.Entity.NoteEntity", b =>
@@ -182,19 +175,6 @@ namespace RepositoryLayer.Migrations
                     b.HasOne("RepositoryLayer.Entity.NoteEntity", "Note")
                         .WithMany()
                         .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("RepositoryLayer.Entity.LabelsEntity", b =>
-                {
-                    b.HasOne("RepositoryLayer.Entity.NoteEntity", "Note")
-                        .WithMany()
-                        .HasForeignKey("NoteId");
-
-                    b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

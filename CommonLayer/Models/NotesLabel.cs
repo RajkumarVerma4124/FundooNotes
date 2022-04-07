@@ -14,7 +14,6 @@ namespace CommonLayer.Models
         [Required(ErrorMessage = "{0} should not be empty")]
         public long NoteId { get; set; }
 
-        //Checking The Pattern For Email And Giving Required Annotations For EmailId property
         [Required(ErrorMessage = "{0} should not be empty")]
         public string LabelName { get; set; }
     }

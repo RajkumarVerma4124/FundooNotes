@@ -16,7 +16,7 @@ namespace BusinessLayer.Interface
         GetNotesResponse GetNote(long noteId, long userId);
         IEnumerable<GetNotesResponse> GetAllNotesByUserId(long userId);
         IEnumerable<GetNotesResponse> GetAllNotes();
-        IEnumerable<GetNotesResponse> GetNotesByLabelName(string labelName);
+        IEnumerable<GetNotesResponse> GetNotesByLabelId(long labelId);
         NoteEntity UpdateNote(NoteUpdate noteUpdate, long noteId, long userId);
         string DeleteNote(long noteId, long userId);
         NoteEntity ChangeIsArchieveStatus(long noteId, long userId);

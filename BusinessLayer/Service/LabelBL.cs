@@ -23,64 +23,11 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Repo Layer IsLabelExist Method
-        public bool IsLabelExist(string labelName)
+        public bool IsLabelExist(string labelName, long userId)
         {
             try
             {
-                return labelRL.IsLabelExist(labelName);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        //Method To Return Repo Layer IsLabelInNoteExist Method
-        public bool IsLabelInNoteExist(string labelName, long noteId)
-        {
-            try
-            {
-                return labelRL.IsLabelInNoteExist(labelName, noteId);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        //Method To Return Repo Layer CreateNoteLabel Method
-        public LabelsEntity CreateNoteLabel(NotesLabel notesLabel, long userId)
-        {
-            try
-            {
-                return labelRL.CreateNoteLabel(notesLabel, userId);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        //Method To Return Repo Layer AddLabelToNote Method
-        public LabelsEntity AddLabelToNote(long labelId, long noteId, long userId)
-
-        {
-            try
-            {
-                return labelRL.AddLabelToNote(labelId, noteId, userId);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        //Method To Return Repo Layer EditLabel Method
-        public LabelsEntity EditLabel(string newLabelName, long userId, long labelId)
-        {
-            try
-            {
-                return labelRL.EditLabel(newLabelName, userId, labelId);
+                return labelRL.IsLabelExist(labelName, userId);
             }
             catch (Exception ex)
             {
@@ -89,7 +36,7 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Repo Layer CreateNewLabel Method
-        public LabelsEntity CreateNewLabel(string labelName, long userId)
+        public LabelNameEntity CreateNewLabel(string labelName, long userId)
         {
             try
             {
@@ -101,12 +48,40 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Return Repo Layer RemoveLabel Method
-        public string RemoveLabel(long labelId, long userId)
+        //Method To Return Repo Layer AddNoteLabel Method
+        public LabelsEntity AddNoteLabel(NotesLabel notesLabel, long userId)
         {
             try
             {
-                return labelRL.RemoveLabel(labelId, userId);
+                return labelRL.AddNoteLabel(notesLabel, userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Return Repo Layer EditLabel Method
+        public LabelNameEntity EditLabel(string newLabelName, long userId, long labelId)
+        {
+            try
+            {
+                return labelRL.EditLabel(newLabelName, userId, labelId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+
+        //Method To Return Repo Layer RemoveLabel Method
+        public string RemoveLabel(long labelId, long noteId, long userId)
+        {
+            try
+            {
+                return labelRL.RemoveLabel(labelId, noteId, userId);
             }
             catch (Exception ex)
             {
@@ -115,11 +90,11 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Repo Layer DeleteLabel Method
-        public string DeleteLabel(string labelName, long userId)
+        public string DeleteLabel(long labelNameId, long userId)
         {
             try
             {
-                return labelRL.DeleteLabel(labelName, userId);
+                return labelRL.DeleteLabel(labelNameId, userId);
             }
             catch (Exception ex)
             {
@@ -128,7 +103,7 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Repo Layer GetNotesLabels Method
-        public IEnumerable<LabelsEntity> GetNotesLabels(long noteId, long userId)
+        public IEnumerable<LabelsResponse> GetNotesLabels(long noteId, long userId)
         {
             try
             {
@@ -140,12 +115,25 @@ namespace BusinessLayer.Service
             };
         }
 
-        //Method To Return Repo Layer GetLabelsList Method
-        public IEnumerable<LabelsEntity> GetLabelsList(long userId)
+        //Method To Return Repo Layer GetUsersLabelsList Method
+        public IEnumerable<LabelsResponse> GetUsersLabelsList(long userId)
         {
             try
             {
-                return labelRL.GetLabelsList(userId);
+                return labelRL.GetUsersLabelsList(userId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Return Repo Layer GetUsersLabelsNameList Method
+        public IEnumerable<LabelNameEntity> GetUsersLabelNamesList(long userId)
+        {
+            try
+            {
+                return labelRL.GetUsersLabelNamesList(userId);
             }
             catch (Exception ex)
             {

@@ -24,12 +24,12 @@ namespace RepositoryLayer.Service
         }
 
         //Method to check if current Label Name Exist Or Not;
-        public bool IsLabelExist(string labelName)
+        public bool IsLabelExist(string labelName, long userId)
         {
             try
             {
                 //Condition For Checking Lable Name If Its Exist Or Not
-                var LabelCount = fundooContext.LabelsData.Where(l => l.LabelName == labelName).Count();
+                var LabelCount = fundooContext.LabelsNameData.Where(l => l.LabelName == labelName && l.UserId == userId).Count();
                 return LabelCount > 0;
             }
             catch (Exception ex)
@@ -38,36 +38,20 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method to check if current Label Name In Note Exist Or Not;
-        public bool IsLabelInNoteExist(string labelName, long noteId)
-        {
-            try
-            {
-                //Condition For Checking Lable Name If Its Exist Or Not
-                var LabelCount = fundooContext.LabelsData.Where(l => l.LabelName == labelName && l.NoteId == noteId).Count();
-                return LabelCount > 0;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        //Method To Create New Labels Without Adding To Notes 
-        public LabelsEntity CreateNewLabel(string labelName, long userId)
+        //Method To Create New Labels 
+        public LabelNameEntity CreateNewLabel(string labelName, long userId)
         {
             try
             {
                 var notesDetails = fundooContext.NotesData.Where(n => n.UserId == userId).FirstOrDefault();
                 if (notesDetails != null)
                 {
-                    LabelsEntity labels = new LabelsEntity()
+                    LabelNameEntity labels = new LabelNameEntity()
                     {
                         LabelName = labelName,
                         UserId = userId,
-                        NoteId = null,
                     };
-                    fundooContext.LabelsData.Add(labels);
+                    fundooContext.LabelsNameData.Add(labels);
                     var result = fundooContext.SaveChanges();
                     if (result > 0)
                         return labels;
@@ -84,18 +68,35 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Create New Labels In Notes If It Doesnt Have Any Existing Labels
-        public LabelsEntity CreateNoteLabel(NotesLabel notesLabel, long userId)
+        public LabelsEntity AddNoteLabel(NotesLabel notesLabel, long userId)
         {
             try
             {
                 var notesDetails = fundooContext.NotesData.Where(n => n.NoteId == notesLabel.NoteId && n.UserId == userId).FirstOrDefault();
-                if (notesDetails != null)
+                var labelsName = fundooContext.LabelsNameData.Where(l => l.LabelName == notesLabel.LabelName).FirstOrDefault(); 
+                if (notesDetails != null && labelsName != null)
                 {
                     LabelsEntity labels = new LabelsEntity()
                     {
-                        LabelName = notesLabel.LabelName,
+                        LabelNameId = labelsName.LabelNameId,
                         NoteId = notesLabel.NoteId,
-                        UserId = notesDetails.UserId
+                        UserId = userId
+                    };
+                    fundooContext.LabelsData.Add(labels);
+                    var result = fundooContext.SaveChanges();
+                    if (result > 0)
+                        return labels;
+                    else
+                        return null;
+                }
+                else if (notesDetails != null && labelsName == null)
+                {
+                    var resultLabel = CreateNewLabel(notesLabel.LabelName, userId);
+                    LabelsEntity labels = new LabelsEntity()
+                    {
+                        LabelNameId = resultLabel.LabelNameId,
+                        NoteId = notesLabel.NoteId,
+                        UserId = userId
                     };
                     fundooContext.LabelsData.Add(labels);
                     var result = fundooContext.SaveChanges();
@@ -113,44 +114,18 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes And Add The Label Using Note Id And UserId
-        public LabelsEntity AddLabelToNote(long labelId, long noteId, long userId)
-        {
-            try
-            {
-                var noteDetails = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
-                var labelDetails = fundooContext.LabelsData.Where(n => n.LabelId == labelId).FirstOrDefault();
-                if (labelDetails != null && noteDetails != null)
-                {
-                    labelDetails.NoteId = noteId;
-                    fundooContext.LabelsData.Update(labelDetails);
-                    var result = fundooContext.SaveChanges();
-                    if (result > 0)
-                        return labelDetails;
-                    else
-                        return null;
-                }
-                else
-                    return null;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         //Method To Fetch The Labels And Edit The Label Using label Id And UserId
-        public LabelsEntity EditLabel(string newLabelName, long userId, long labelId)
+        public LabelNameEntity EditLabel(string newLabelName, long userId, long labelNameId)
         {
             try
             {
-                var labelDetails = fundooContext.LabelsData.Where(l => l.LabelId == labelId && l.UserId == userId).FirstOrDefault();
-                if (labelDetails != null)
+                var labelNameDetails = fundooContext.LabelsNameData.Where(l => l.LabelNameId == labelNameId && l.UserId == userId).FirstOrDefault();
+                if (labelNameDetails != null)
                 {
-                    labelDetails.LabelName = newLabelName;
+                    labelNameDetails.LabelName = newLabelName;
                     var result = fundooContext.SaveChanges();
                     if (result > 0)
-                        return labelDetails;
+                        return labelNameDetails;
                     else
                         return null;
                 }
@@ -163,12 +138,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch And Remove The Labels Using Label Id And UserId
-        public string RemoveLabel (long labelId, long userId)
+        //Method To Fetch And Remove The Labels From Notes Using Label Id And UserId
+        public string RemoveLabel (long labelId, long noteId, long userId)
         {
             try
             {
-                var labelDetails = fundooContext.LabelsData.Where(l => l.LabelId == labelId && l.UserId == userId).FirstOrDefault();
+                var labelDetails = fundooContext.LabelsData.Where(l => l.LabelId == labelId && l.UserId == userId && l.NoteId == noteId).FirstOrDefault();
                 if (labelDetails != null)
                 {
                     fundooContext.LabelsData.Remove(labelDetails);
@@ -188,14 +163,14 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch And Delete The Labels Using Label Name And UserId
-        public string DeleteLabel(string labelName, long userId)
+        public string DeleteLabel(long labelNameId, long userId)
         {
             try
             {
-                var labelDetails = fundooContext.LabelsData.Where(l => l.LabelName == labelName && l.UserId == userId).ToList();
+                var labelDetails = fundooContext.LabelsNameData.Where(l => l.LabelNameId == labelNameId && l.UserId == userId).FirstOrDefault();
                 if (labelDetails != null)
                 {
-                    fundooContext.LabelsData.RemoveRange(labelDetails);
+                    fundooContext.LabelsNameData.Remove(labelDetails);
                     var result = fundooContext.SaveChanges();
                     if (result > 0)
                         return "Label Deleted Succesfully";
@@ -212,13 +187,33 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Lables Lists
-        public IEnumerable<LabelsEntity> GetNotesLabels(long noteId, long userId)
+        public IEnumerable<LabelsResponse> GetNotesLabels(long noteId, long userId)
         {
             try
             {
+                IList<LabelsResponse> noteLabelsList = new List<LabelsResponse>();
+                var labelsNameList = fundooContext.LabelsNameData.ToList();
                 var labelsList = fundooContext.LabelsData.Where(c => c.NoteId == noteId && c.UserId == userId).ToList();
+                foreach (var label in labelsList)
+                {
+                    foreach (var labelName in labelsNameList)
+                    {
+                        if(labelName.LabelNameId == label.LabelNameId)
+                        {
+                            LabelsResponse getNoteLabels = new LabelsResponse()
+                            {
+                                LabelId = label.LabelId,
+                                LabelNameId = labelName.LabelNameId,
+                                LabelName = labelName.LabelName,
+                                UserId = label.UserId,
+                                NoteId = label.NoteId
+                            };
+                            noteLabelsList.Add(getNoteLabels);
+                        }
+                    }
+                }
                 if (labelsList.Count() > 0)
-                    return labelsList;
+                    return noteLabelsList;
                 else
                     return null;
             }
@@ -228,15 +223,52 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Lables Lists
-        public IEnumerable<LabelsEntity> GetLabelsList(long userId)
+        //Method To Fetch The Users Lables Lists
+        public IEnumerable<LabelsResponse> GetUsersLabelsList(long userId)
         {
             try
             {
+                IList<LabelsResponse> noteLabelsList = new List<LabelsResponse>();
+                var labelsNameList = fundooContext.LabelsNameData.ToList();
                 var notesList = fundooContext.NotesData.Where(u => u.UserId == userId).ToList();
                 var labelsList = fundooContext.LabelsData.Where(l => l.UserId == userId).ToList();
+                foreach (var label in labelsList)
+                {
+                    foreach (var labelName in labelsNameList)
+                    {
+                        if (labelName.LabelNameId == label.LabelNameId)
+                        {
+                            LabelsResponse getNoteLabels = new LabelsResponse()
+                            {
+                                LabelId = label.LabelId,
+                                LabelNameId = labelName.LabelNameId,
+                                LabelName = labelName.LabelName,
+                                UserId = label.UserId,
+                                NoteId = label.NoteId
+                            };
+                            noteLabelsList.Add(getNoteLabels);
+                        }
+                    }
+                }
                 if (labelsList.Count() > 0)
-                    return labelsList;
+                    return noteLabelsList;
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //Method To Fetch The Lables Lists With Notes
+        public IEnumerable<LabelNameEntity> GetUsersLabelNamesList(long userId)
+        {
+            try
+            {
+                var labelsNameList = fundooContext.LabelsNameData.Where(l => l.UserId == userId).ToList();
+                if (labelsNameList.Count() > 0)
+                    return labelsNameList;
                 else
                     return null;
             }

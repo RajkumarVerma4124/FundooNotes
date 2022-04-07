@@ -34,29 +34,6 @@ namespace FundooNotes.Controllers
         }
 
         //Post Request For Creating A New Label (POST: /api/labels/create)
-        [HttpPost("CreateNote")]
-        public IActionResult CreateNoteLabel(NotesLabel notesLabel)
-        {
-            try
-            {
-                //Getting The Id Of Authorized User Using Claims Of Jwt
-                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var ifLabelExist = labelBL.IsLabelInNoteExist(notesLabel.LabelName, notesLabel.NoteId);
-                if (ifLabelExist)
-                    return Ok(new { success = false, message = "The Label Already Exists" });
-                var labelRes = labelBL.CreateNoteLabel(notesLabel, userId);
-                if (labelRes != null)
-                    return Ok(new { Success = true, message = "Label Added In Note Successfully", data = labelRes });
-                else
-                    return BadRequest(new { Success = false, message = "Label Creation Failed" });
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new { success = false, message = ex.Message });
-            }
-        }
-
-        //Post Request For Creating A New Label (POST: /api/labels/create)
         [HttpPost("Create")]
         public IActionResult CreateNewLabel(string labelName)
         {
@@ -64,7 +41,7 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var ifLabelExist = labelBL.IsLabelExist(labelName);
+                var ifLabelExist = labelBL.IsLabelExist(labelName, userId);
                 if (ifLabelExist)
                     return Ok(new { success = false, message = "The Label Already Exists" });
                 var labelRes = labelBL.CreateNewLabel(labelName, userId);
@@ -79,21 +56,19 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Patch Request For Creating A New Label For Particular Note (POST: /api/labels/AddToNote)
-        [HttpPatch("AddToNote")]
-        public IActionResult AddLabelToNote(long labelId, long noteId)
+        //Post Request For Creating A New Label In Notes Its Not Exist (POST: /api/labels/create)
+        [HttpPost("AddToNote")]
+        public IActionResult AddNoteLabel(NotesLabel notesLabel)
         {
             try
             {
-                if (labelId <= 0 && noteId <= 0)
-                    return BadRequest(new { success = false, message = "Note Id Or Label Id Should Be Greater Than Zero" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var labelRes = labelBL.AddLabelToNote(labelId, noteId, userId);
+                var labelRes = labelBL.AddNoteLabel(notesLabel, userId);
                 if (labelRes != null)
-                    return Ok(new { Success = true, message = "Label Added To Note Successfully", data = labelRes });
+                    return Ok(new { Success = true, message = "Label Added In Note Successfully", data = labelRes });
                 else
-                    return BadRequest(new { Success = false, message = "Label Addition To Note Failed" });
+                    return BadRequest(new { Success = false, message = "Label Creation Failed" });  
             }
             catch (Exception ex)
             {
@@ -125,7 +100,7 @@ namespace FundooNotes.Controllers
 
         //Delete Request For Removing A Label From Particular Note(Delete: /api/labels/remove)
         [HttpDelete("Remove")]
-        public IActionResult RemoveLabel(long labelId)
+        public IActionResult RemoveLabel(long labelId, long noteId)
         {
             try
             {
@@ -133,7 +108,7 @@ namespace FundooNotes.Controllers
                     return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var labelRes = labelBL.RemoveLabel(labelId, userId);
+                var labelRes = labelBL.RemoveLabel(labelId, noteId,userId);
                 if (labelRes.Contains("Removed"))
                     return Ok(new { Success = true, message = labelRes });
                 else
@@ -147,13 +122,13 @@ namespace FundooNotes.Controllers
 
         //Delete Request For Deleting A Label (Delete: /api/labels/delete)
         [HttpDelete("Delete")]
-        public IActionResult DeleteLabel(string labelName)
+        public IActionResult DeleteLabel(long labelNameId)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var labelRes = labelBL.DeleteLabel(labelName, userId);
+                var labelRes = labelBL.DeleteLabel(labelNameId, userId);
                 if (labelRes.Contains("Deleted"))
                     return Ok(new { Success = true, message = labelRes });
                 else
@@ -166,7 +141,7 @@ namespace FundooNotes.Controllers
         }
 
         //Get Request For Retrieving List Of Notes Labels (Get: /api/labels/get)
-        [HttpGet("Get")]
+        [HttpGet("GetNotes")]
         public IActionResult GetNoteLabels(long noteId)
         {
             try
@@ -189,17 +164,37 @@ namespace FundooNotes.Controllers
 
         //Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
         [HttpGet("GetAll")]
-        public IActionResult GetLabelsList()
+        public IActionResult GetUsersLabelsList()
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var labelRes = labelBL.GetLabelsList(userId);
+                var labelRes = labelBL.GetUsersLabelsList(userId);
                 if (labelRes != null)
                     return Ok(new { Success = true, message = "Got The Label Successfully", data = labelRes });
                 else
                     return Unauthorized(new { Success = false, message = "Label Retreival Failed", data = labelRes });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+        }
+
+        //Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
+        [HttpGet("GetNames")]
+        public IActionResult GetUsersLabelNamesList()
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var labelRes = labelBL.GetUsersLabelNamesList(userId);
+                if (labelRes != null)
+                    return Ok(new { Success = true, message = "Got The Label Names Successfully", data = labelRes });
+                else
+                    return Unauthorized(new { Success = false, message = "Label Nams Retreival Failed", data = labelRes });
             }
             catch (Exception ex)
             {
@@ -212,18 +207,18 @@ namespace FundooNotes.Controllers
         {
             var cacheKey = "labelsList";
             string serializedLabelList;
-            var labelsList = new List<LabelsEntity>();
+            var labelsList = new List<LabelsResponse>();
             var redisLabelsList = await distributedCache.GetAsync(cacheKey);
             if (redisLabelsList != null)
             {
                 serializedLabelList = Encoding.UTF8.GetString(redisLabelsList);
-                labelsList = JsonConvert.DeserializeObject<List<LabelsEntity>>(serializedLabelList);
+                labelsList = JsonConvert.DeserializeObject<List<LabelsResponse>>(serializedLabelList);
             }
             else
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                labelsList = labelBL.GetLabelsList(userId).ToList();
+                labelsList = labelBL.GetUsersLabelsList(userId).ToList();
                 serializedLabelList = JsonConvert.SerializeObject(labelsList);
                 redisLabelsList = Encoding.UTF8.GetBytes(serializedLabelList);
                 var options = new DistributedCacheEntryOptions()

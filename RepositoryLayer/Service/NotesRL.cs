@@ -206,7 +206,7 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch Multiple Notes Details From DB Using Label Name
-        public IEnumerable<GetNotesResponse> GetNotesByLabelName(string labelName)
+        public IEnumerable<GetNotesResponse> GetNotesByLabelId(long labelNameId)
         {
             try
             {
@@ -214,7 +214,7 @@ namespace RepositoryLayer.Service
                 IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
                 List<NoteEntity> resNotesList = new List<NoteEntity>();
                 NoteEntity noteRes = null;
-                var labelsList = fundooContext.LabelsData.Where(l => l.LabelName == labelName).ToList();
+                var labelsList = fundooContext.LabelsData.Where(l => l.LabelNameId == labelNameId).ToList();
                 if (labelsList.Count() > 0)
                 {
                     foreach (var labels in labelsList)

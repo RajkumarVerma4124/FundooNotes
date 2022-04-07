@@ -15,7 +15,13 @@ namespace RepositoryLayer.Entity
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long LabelId { get; set; }
-        public string LabelName { get; set; }
+
+        [ForeignKey("LabelName")]
+        public long LabelNameId { get; set; }
+
+        [JsonIgnore]
+        public virtual LabelNameEntity LabelName { get; set; }
+
         [ForeignKey("User")]
         public long UserId { get; set; }
 
@@ -23,9 +29,11 @@ namespace RepositoryLayer.Entity
         public virtual UserEntity User { get; set; }
 
         [ForeignKey("Note")]
-        public long? NoteId { get; set; }
+        public long NoteId { get; set; }
 
         [JsonIgnore]
         public virtual NoteEntity Note { get; set; }
+
+
     }
 }
