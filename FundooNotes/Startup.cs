@@ -67,6 +67,11 @@ namespace FundooNotes
                 };
             });
             services.AddControllers();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
+            services.AddMemoryCache();
         }
 
         private static void ConfigureSwagger(IServiceCollection services)

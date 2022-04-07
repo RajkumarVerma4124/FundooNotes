@@ -3,8 +3,15 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
+using RepositoryLayer.Entity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
 {
@@ -15,11 +22,15 @@ namespace FundooNotes.Controllers
     {
         //Reference Object For Interface IUserRL
         private readonly ILabelBL labelBL;
+        private readonly IDistributedCache distributedCache;
+        private readonly IMemoryCache memoryCache;
 
         //Created Constructor With Dependency Injection For IUSerRL
-        public LabelsController(ILabelBL labelBL)
+        public LabelsController(ILabelBL labelBL, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
             this.labelBL = labelBL;
+            this.memoryCache = memoryCache;
+            this.distributedCache = distributedCache;
         }
 
         //Post Request For Creating A New Label (POST: /api/labels/create)
@@ -194,6 +205,33 @@ namespace FundooNotes.Controllers
             {
                 return NotFound(new { success = false, message = ex.Message });
             }
+        }
+
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllLabelUsingRedisCache()
+        {
+            var cacheKey = "labelsList";
+            string serializedLabelList;
+            var labelsList = new List<LabelsEntity>();
+            var redisLabelsList = await distributedCache.GetAsync(cacheKey);
+            if (redisLabelsList != null)
+            {
+                serializedLabelList = Encoding.UTF8.GetString(redisLabelsList);
+                labelsList = JsonConvert.DeserializeObject<List<LabelsEntity>>(serializedLabelList);
+            }
+            else
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                labelsList = labelBL.GetLabelsList(userId).ToList();
+                serializedLabelList = JsonConvert.SerializeObject(labelsList);
+                redisLabelsList = Encoding.UTF8.GetBytes(serializedLabelList);
+                var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                await distributedCache.SetAsync(cacheKey, redisLabelsList, options);
+            }
+            return Ok(labelsList);
         }
     }
 }
