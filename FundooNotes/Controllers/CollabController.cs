@@ -102,7 +102,7 @@ namespace FundooNotes.Controllers
         }
 
         [HttpGet("redis")]
-        public async Task<IActionResult> GetAllLabelUsingRedisCache(long noteId)
+        public async Task<IActionResult> GetAllCollabUsingRedisCache(long noteId)
         {
             var cacheKey = "collabList";
             string serializedCollabNoteList;
