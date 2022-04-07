@@ -24,10 +24,14 @@ namespace RepositoryLayer.Service
         }
 
         //Method to check if current email id provided by user is exist in Collab table or not;
-        public bool IsEmailIdExist(string emailId, long noteId)
+        public bool IsEmailIdExist(string emailId, long noteId, long userId)
         {
             try
             {
+                var ownerNotesDetails = fundooContext.NotesData.FirstOrDefault(o => o.NoteId == noteId);
+                var ownerCollabDetails = fundooContext.UserData.FirstOrDefault(o => o.UserId == ownerNotesDetails.UserId);
+                if (ownerCollabDetails.EmailId == emailId)
+                    return true;
                 //Condition For Checking Collaborator Email If Its Exist Or Not
                 var emailIdCount = fundooContext.CollaboratorData.Where(e => e.CollabEmail == emailId && e.NoteId == noteId).Count();
                 return emailIdCount > 0;
@@ -77,22 +81,12 @@ namespace RepositoryLayer.Service
                 var collabRes = fundooContext.CollaboratorData.FirstOrDefault(c => c.CollabId == collabId && c.NoteId == notesId);
                 if (collabRes != null)
                 {
-                    var collabOwner = fundooContext.NotesData.FirstOrDefault(c => c.NoteId == notesId);
-                    if(collabOwner.UserId == collabRes.UserId && collabOwner.NoteId == collabRes.NoteId)
-                    {
-                        return "You Cant Remove The Owner Of Collaborator";
-                    }
-                    else if(collabOwner.UserId != collabRes.UserId)
-                    {
-                        fundooContext.CollaboratorData.Remove(collabRes);
-                        var result = fundooContext.SaveChanges();
-                        if (result > 0)
-                            return "Collaborater Deleted Succesfully";
-                        else
-                            return null;
-                    }    
+                    fundooContext.CollaboratorData.Remove(collabRes);
+                    var result = fundooContext.SaveChanges();
+                    if (result > 0)
+                        return "Collaborater Deleted Succesfully";
                     else
-                        return "You Cant Remove The Owner Of This Note";
+                        return null;
                 }
                 else
                     return "Collaborater Deletion Failed";
@@ -104,18 +98,44 @@ namespace RepositoryLayer.Service
         }
 
         //Method To Fetch The Note Collaborators Lists
-        public IEnumerable<CollaboratorEntity> GetNoteCollaborators(long noteId, long userId)
+        public IEnumerable<CollabListResponse> GetNoteCollaborators(long noteId, long userId)
         {
             try
             {
-                var iscollabExist = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId && c.UserId == userId).ToList();
-                if (iscollabExist.Count() > 0)
+                List<CollabListResponse> collabNotesList = new List<CollabListResponse>();
+                var ownerNotesDetails = fundooContext.NotesData.FirstOrDefault(o => o.NoteId == noteId);
+                var ownerCollabDetails = fundooContext.UserData.FirstOrDefault(o => o.UserId == ownerNotesDetails.UserId);
+                var userDetails = fundooContext.UserData.FirstOrDefault(o => o.UserId == userId);
+                var collabList = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId).ToList();
+                if (ownerCollabDetails != null || collabList.Count() > 0)
                 {
-                    var collabRes = fundooContext.CollaboratorData.Where(c => c.NoteId == noteId).ToList();
-                    if (collabRes.Count() > 0)
-                        return collabRes;
-                    else
-                        return null;
+                    //Condition For Adding CollabOwner
+                    CollabListResponse collabOwner = new CollabListResponse()
+                    {
+                        FirstName = ownerCollabDetails.UserId == userId ? ownerCollabDetails.FirstName : null,
+                        LastName = ownerCollabDetails.UserId == userId ? ownerCollabDetails.LastName : null,
+                        CollabId = null,
+                        CollabEmail = ownerCollabDetails.EmailId,
+                        UserId = userId,
+                        NoteId = noteId,
+                    };
+                    collabNotesList.Add(collabOwner);
+
+                    //Condition For Adding CollabsUser
+                    foreach (var collab in collabList)
+                    {
+                        CollabListResponse collabUsers = new CollabListResponse()
+                        {
+                            FirstName = ownerCollabDetails.UserId != userId && collab.UserId == userId ? userDetails.FirstName : null,
+                            LastName = ownerCollabDetails.UserId != userId && collab.UserId == userId ? userDetails.LastName : null,
+                            CollabId = collab.CollabId,
+                            CollabEmail = collab.CollabEmail,
+                            UserId = collab.UserId,
+                            NoteId = collab.NoteId,
+                        };
+                        collabNotesList.Add(collabUsers);
+                    }
+                    return collabNotesList;
                 }
                 else
                     return null;            

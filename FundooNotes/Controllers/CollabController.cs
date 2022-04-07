@@ -42,7 +42,7 @@ namespace FundooNotes.Controllers
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId);
+                var ifEmailExist = collabBL.IsEmailIdExist(notesCollab.CollabEmail, notesCollab.NoteId, userId);
                 if (ifEmailExist)
                     return Ok(new { success = false, message = "The Email Already Exists" });
                 var collabRes = collabBL.AddCollaborator(notesCollab, userId);
@@ -106,12 +106,12 @@ namespace FundooNotes.Controllers
         {
             var cacheKey = "collabList";
             string serializedCollabNoteList;
-            var collabsNoteList = new List<CollaboratorEntity>();
+            var collabsNoteList = new List<CollabListResponse>();
             var redisCollabsNoteList = await distributedCache.GetAsync(cacheKey);
             if (redisCollabsNoteList != null)
             {
                 serializedCollabNoteList = Encoding.UTF8.GetString(redisCollabsNoteList);
-                collabsNoteList = JsonConvert.DeserializeObject<List<CollaboratorEntity>>(serializedCollabNoteList);
+                collabsNoteList = JsonConvert.DeserializeObject<List<CollabListResponse>>(serializedCollabNoteList);
             }
             else
             {

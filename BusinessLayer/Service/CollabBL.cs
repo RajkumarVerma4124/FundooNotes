@@ -24,11 +24,11 @@ namespace BusinessLayer.Service
 
         //Method To Return Repo Layer EmailExist Method
 
-        public bool IsEmailIdExist(string emailId, long noteId)
+        public bool IsEmailIdExist(string emailId, long noteId, long userId)
         {
             try
             {
-                return colabRL.IsEmailIdExist(emailId, noteId);
+                return colabRL.IsEmailIdExist(emailId, noteId, userId);
             }
             catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace BusinessLayer.Service
         }
 
         //Method To Return Repo Layer GetCollaborater Method
-        public IEnumerable<CollaboratorEntity> GetNoteCollaborators(long noteId, long userId)
+        public IEnumerable<CollabListResponse> GetNoteCollaborators(long noteId, long userId)
         {
             try
             {

@@ -194,26 +194,28 @@ namespace RepositoryLayer.Service
                 IList<LabelsResponse> noteLabelsList = new List<LabelsResponse>();
                 var labelsNameList = fundooContext.LabelsNameData.ToList();
                 var labelsList = fundooContext.LabelsData.Where(c => c.NoteId == noteId && c.UserId == userId).ToList();
-                foreach (var label in labelsList)
+                if(labelsList.Count() > 0)
                 {
-                    foreach (var labelName in labelsNameList)
+                    foreach (var label in labelsList)
                     {
-                        if(labelName.LabelNameId == label.LabelNameId)
+                        foreach (var labelName in labelsNameList)
                         {
-                            LabelsResponse getNoteLabels = new LabelsResponse()
+                            if (labelName.LabelNameId == label.LabelNameId)
                             {
-                                LabelId = label.LabelId,
-                                LabelNameId = labelName.LabelNameId,
-                                LabelName = labelName.LabelName,
-                                UserId = label.UserId,
-                                NoteId = label.NoteId
-                            };
-                            noteLabelsList.Add(getNoteLabels);
+                                LabelsResponse getNoteLabels = new LabelsResponse()
+                                {
+                                    LabelId = label.LabelId,
+                                    LabelNameId = labelName.LabelNameId,
+                                    LabelName = labelName.LabelName,
+                                    UserId = label.UserId,
+                                    NoteId = label.NoteId
+                                };
+                                noteLabelsList.Add(getNoteLabels);
+                            }
                         }
                     }
-                }
-                if (labelsList.Count() > 0)
                     return noteLabelsList;
+                }
                 else
                     return null;
             }
@@ -232,26 +234,28 @@ namespace RepositoryLayer.Service
                 var labelsNameList = fundooContext.LabelsNameData.ToList();
                 var notesList = fundooContext.NotesData.Where(u => u.UserId == userId).ToList();
                 var labelsList = fundooContext.LabelsData.Where(l => l.UserId == userId).ToList();
-                foreach (var label in labelsList)
+                if(labelsList.Count > 0)
                 {
-                    foreach (var labelName in labelsNameList)
+                    foreach (var label in labelsList)
                     {
-                        if (labelName.LabelNameId == label.LabelNameId)
+                        foreach (var labelName in labelsNameList)
                         {
-                            LabelsResponse getNoteLabels = new LabelsResponse()
+                            if (labelName.LabelNameId == label.LabelNameId)
                             {
-                                LabelId = label.LabelId,
-                                LabelNameId = labelName.LabelNameId,
-                                LabelName = labelName.LabelName,
-                                UserId = label.UserId,
-                                NoteId = label.NoteId
-                            };
-                            noteLabelsList.Add(getNoteLabels);
+                                LabelsResponse getNoteLabels = new LabelsResponse()
+                                {
+                                    LabelId = label.LabelId,
+                                    LabelNameId = labelName.LabelNameId,
+                                    LabelName = labelName.LabelName,
+                                    UserId = label.UserId,
+                                    NoteId = label.NoteId
+                                };
+                                noteLabelsList.Add(getNoteLabels);
+                            }
                         }
                     }
-                }
-                if (labelsList.Count() > 0)
                     return noteLabelsList;
+                }
                 else
                     return null;
             }

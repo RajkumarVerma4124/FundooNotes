@@ -58,9 +58,9 @@ namespace RepositoryLayer.Service
                 {
                     imageList = AddImages(notesEntity.NoteId, userId, userNotes.ImagePaths);
                 }
-                //Calling The Method To Add Owner In Collab While Creating Note
-                var resOwnerCollab = AddOwner(notesEntity.NoteId, userId);
-                if (res > 0 && resOwnerCollab)
+                /*//Calling The Method To Add Owner In Collab While Creating Note
+                var resOwnerCollab = AddOwner(notesEntity.NoteId, userId);*/
+                if (res > 0)
                 {
                     NotesResponse notesResponse = new NotesResponse()
                     {
@@ -78,12 +78,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method For Adding Default Collaborator As User Who Is Logged In
+ /*       //Method For Adding Default Collaborator As User Who Is Logged In
         public bool AddOwner(long noteId, long userId)
         {
             CollabRL collabRL = new CollabRL(fundooContext);
             var userDetails = fundooContext.UserData.Where(u => u.UserId == userId).FirstOrDefault();
-            var resOwnerEmail = collabRL.IsEmailIdExist(userDetails.EmailId, noteId);
+            var resOwnerEmail = collabRL.IsEmailIdExist(userDetails.EmailId, noteId, userId);
             if (resOwnerEmail == false)
             {
                 NotesCollab notesCollab = new NotesCollab { CollabEmail = userDetails.EmailId, NoteId = noteId };
@@ -95,7 +95,7 @@ namespace RepositoryLayer.Service
             }
             else
                 return false;
-        }
+        }*/
 
         //Method To Fetch Single Note Details By Giving Note And User Ids
         public GetNotesResponse GetNote(long noteId, long userId)
@@ -145,25 +145,16 @@ namespace RepositoryLayer.Service
                 IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
                 List<NoteEntity> resCollabList = new List<NoteEntity>();
                 List<NoteEntity> resNotesList = new List<NoteEntity>();
-                CollaboratorEntity collabNoteRes = null;
-                NoteEntity noteRes = null;
                 var userNotesList = fundooContext.NotesData.Where(n => n.UserId == userId).ToList();
                 resNotesList.AddRange(userNotesList);
                 var collabList = fundooContext.CollaboratorData.Where(n => n.UserId == userId).ToList();
                 if (collabList.Count() > 0)
                 {
-                    //Condition For Adding Notes Which Are Shared By Other Users And Note His Own 
                     foreach (var collab in collabList)
                     {
-                        var userNote = fundooContext.NotesData.FirstOrDefault(n => n.UserId == collab.UserId && n.NoteId == collab.NoteId);
-                        if(userNote == null)
-                        {
-                            collabNoteRes = fundooContext.CollaboratorData.Where(n => n.UserId == collab.UserId && n.NoteId == collab.NoteId).FirstOrDefault();
-                            if (collabNoteRes != null)
-                                noteRes = fundooContext.NotesData.FirstOrDefault(n => n.NoteId == collabNoteRes.NoteId);
-                            if (noteRes != null)
-                                resNotesList.Add(noteRes);
-                        }  
+                        var noteRes = fundooContext.NotesData.FirstOrDefault(n => n.NoteId == collab.NoteId);
+                        if (noteRes != null)
+                            resNotesList.Add(noteRes);
                     }
                 }
                 if (resNotesList.Count() > 0) 
