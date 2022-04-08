@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,17 +23,17 @@ namespace FundooNotes.Controllers
     [Authorize]
     public class NotesController : ControllerBase
     {
-        //Object Reference For Interface INotesBL,IDistributedCache,IMemoryCache
+        //Object Reference For Interface INotesBL,IDistributedCache,IMemoryCache,ILogger
         private readonly INotesBL notesBL;
         private readonly IDistributedCache distributedCache;
-        private readonly IMemoryCache memoryCache;
+        private readonly ILogger<NotesController> logger;
 
         //Constructor To Initialize The Instance Of Interface INotesBL
-        public NotesController(INotesBL notesBL, IMemoryCache memoryCache, IDistributedCache distributedCache)
+        public NotesController(INotesBL notesBL, IDistributedCache distributedCache, ILogger<NotesController> logger)
         {
             this.notesBL = notesBL;
-            this.memoryCache = memoryCache;
             this.distributedCache = distributedCache;
+            this.logger = logger;
         }
 
         //Post Request For Creating A New Notes For Particular User Id (POST: /api/notes/createnote)
@@ -45,12 +46,19 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = notesBL.CreateNote(userNotes, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Note Created Successfully");
                     return Ok(new { success = true, message = "Note Created Successfully", data = resNote });
+                }
                 else
+                {
+                    logger.LogError("Note Creation Failed");
                     return BadRequest(new { success = false, message = "Note Creation Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(" Exception Thrown ..", ex.Message);
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -64,15 +72,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (notesId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.GetNote(notesId, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Got The Note Successfully");
                     return Ok(new { success = true, message = "Got The Note Successfully", data = resNote });
+                }
                 else
-                    return NotFound(new { success = false, message = "Note With Given Id Not Found" });
+                {
+                    logger.LogError("Note With Given Id Not Found");
+                    return BadRequest(new { success = false, message = "Note With Given Id Not Found" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -87,12 +105,19 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = notesBL.GetAllNotesByUserId(userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Got The Note Successfully");
                     return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
+                }
                 else
+                {
+                    logger.LogError("Notes Retrieval Failed");
                     return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -105,12 +130,19 @@ namespace FundooNotes.Controllers
             {
                 var resNote = notesBL.GetAllNotes();
                 if (resNote != null)
-                    return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
+                {
+                    logger.LogInformation("Got All The Note Successfully");
+                    return Ok(new { success = true, message = "Got All The Notes Successfully", data = resNote });
+                }
                 else
+                {
+                    logger.LogError("Notes Retrieval Failed");
                     return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -125,12 +157,19 @@ namespace FundooNotes.Controllers
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resNote = notesBL.GetNotesByLabelId(labelId);
                 if (resNote != null)
-                    return Ok(new { success = true, message = "Got The Notes Successfully", data = resNote });
+                {
+                    logger.LogInformation("Got The Notes Using Label Id Successfully");
+                    return Ok(new { success = true, message = "Got The Notes Using Label Id Successfully", data = resNote });
+                }
                 else
+                {
+                    logger.LogError("Notes Retrieval Failed");
                     return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -144,15 +183,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.UpdateNote(noteUpdate, noteId, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Updated The Notes Successfully");
                     return Ok(new { success = true, message = "Updated The Notes Successfully", data = resNote });
+                }
                 else
-                    return NotFound(new { success = false, message = "Note With Given Id Not Found For Update" });
+                {
+                    logger.LogError("Note With Given Id Not Found For Update");
+                    return BadRequest(new { success = false, message = "Note With Given Id Not Found For Update" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -166,15 +215,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.DeleteNote(noteId, userId);
-                if (string.IsNullOrEmpty(resNote))
-                    return Ok(new { success = true, message = resNote});
+                if (!string.IsNullOrEmpty(resNote))
+                {
+                    logger.LogInformation(resNote);
+                    return Ok(new { success = true, message = resNote });
+                }
                 else
-                    return NotFound(new { success = false, message = resNote });
+                {
+                    logger.LogError(resNote);
+                    return BadRequest(new { success = false, message = resNote });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -188,15 +247,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.ChangeIsArchieveStatus(noteId, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Archive Status Changed Successfully");
                     return Ok(new { Success = true, message = "Archive Status Changed Successfully", data = resNote });
+                }
                 else
-                    return NotFound(new { Success = false, message = "Archive Status Changed Failed" });
+                {
+                    logger.LogError("Archive Status Changed Failed");
+                    return BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -210,15 +279,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.ChangeIsPinnedStatus(noteId, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Pinned Status Changed Successfully");
                     return Ok(new { Success = true, message = "Pinned Status Changed Successfully", data = resNote });
+                }
                 else
+                {
+                    logger.LogError("Pinned Status Changed Failed");
                     return NotFound(new { Success = false, message = "Pinned Status Changed Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -232,15 +311,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.ChangeIsTrashStatus(noteId, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Trash Status Changed Successfully");
                     return Ok(new { Success = true, message = "Trash Status Changed Successfully", data = resNote });
+                }
                 else
-                    return NotFound(new { Success = false, message = "Trash Status Changed Failed" });
+                {
+                    logger.LogError("Trash Status Changed Failed");
+                    return BadRequest(new { Success = false, message = "Trash Status Changed Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -254,15 +343,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.ChangeColour(noteId, userId, newColor);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Note Colour Changed Successfully");
                     return Ok(new { Success = true, message = "Note Colour Changed successfully ", data = resNote });
+                }
                 else
-                    return NotFound(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
+                {
+                    logger.LogError("Change Color Failed As Given Id Note Found");
+                    return BadRequest(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -275,15 +374,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 var userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.AddImages(noteId, userId, image);
                 if (resNote != null)
+                {
+                    logger.LogInformation("Image Updated Successfully");
                     return Ok(new { Success = true, message = "Image Updated Successfully", data = resNote });
+                }
                 else
-                    return NotFound(new { Success = false, message = "Image Updated Failed " });
+                {
+                    logger.LogError("Image Updation Failed");
+                    return BadRequest(new { Success = false, message = "Image Updation Failed" });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -297,15 +406,25 @@ namespace FundooNotes.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 if (noteId <= 0)
+                {
+                    logger.LogWarning("Note Id Should Be Greater Than Zero");
                     return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                }
                 var resNote = notesBL.DeleteImage(imageId, noteId, userId);
                 if (resNote != null)
+                {
+                    logger.LogInformation(resNote);
                     return Ok(new { Success = true, message = resNote });
+                }
                 else
-                    return NotFound(new { Success = false, message = resNote });
+                {
+                    logger.LogError(resNote);
+                    return BadRequest(new { Success = false, message = resNote });
+                }
             }
             catch (Exception ex)
             {
+                logger.LogCritical(ex, " Exception Thrown...");
                 return NotFound(new { success = false, message = ex.Message });
             }
         }
@@ -313,26 +432,37 @@ namespace FundooNotes.Controllers
         [HttpGet("redis")]
         public async Task<IActionResult> GetAllNotesUsingRedisCache()
         {
-            var cacheKey = "notesList";
-            string serializedNotesList;
-            var notesList = new List<GetNotesResponse>();
-            var redisNotesList = await distributedCache.GetAsync(cacheKey);
-            if (redisNotesList != null)
+            try
             {
-                serializedNotesList = Encoding.UTF8.GetString(redisNotesList);
-                notesList = JsonConvert.DeserializeObject<List<GetNotesResponse>>(serializedNotesList);
+                var cacheKey = "notesList";
+                string serializedNotesList;
+                var notesList = new List<GetNotesResponse>();
+                var redisNotesList = await distributedCache.GetAsync(cacheKey);
+                if (redisNotesList != null)
+                {
+                    logger.LogDebug("Getting The List From Redis Cache");
+                    serializedNotesList = Encoding.UTF8.GetString(redisNotesList);
+                    notesList = JsonConvert.DeserializeObject<List<GetNotesResponse>>(serializedNotesList);
+                }
+                else
+                {
+                    logger.LogDebug("Setting The Notes List To Cache Which Request For First Time");
+                    notesList = notesBL.GetAllNotes().ToList();
+                    serializedNotesList = JsonConvert.SerializeObject(notesList);
+                    redisNotesList = Encoding.UTF8.GetBytes(serializedNotesList);
+                    var options = new DistributedCacheEntryOptions()
+                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                    await distributedCache.SetAsync(cacheKey, redisNotesList, options);
+                }
+                logger.LogInformation("Got The NotesList Successfully Using Redis");
+                return Ok(notesList);
             }
-            else
+            catch (Exception ex)
             {
-                notesList = notesBL.GetAllNotes().ToList();
-                serializedNotesList = JsonConvert.SerializeObject(notesList);
-                redisNotesList = Encoding.UTF8.GetBytes(serializedNotesList);
-                var options = new DistributedCacheEntryOptions()
-                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(2));
-                await distributedCache.SetAsync(cacheKey, redisNotesList, options);
+                logger.LogCritical(ex, " Exception Thrown...");
+                return NotFound(new { success = false, message = ex.Message });
             }
-            return Ok(notesList);
         }
     }
 }
