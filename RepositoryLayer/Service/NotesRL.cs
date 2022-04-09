@@ -78,25 +78,6 @@ namespace RepositoryLayer.Service
             }
         }
 
- /*       //Method For Adding Default Collaborator As User Who Is Logged In
-        public bool AddOwner(long noteId, long userId)
-        {
-            CollabRL collabRL = new CollabRL(fundooContext);
-            var userDetails = fundooContext.UserData.Where(u => u.UserId == userId).FirstOrDefault();
-            var resOwnerEmail = collabRL.IsEmailIdExist(userDetails.EmailId, noteId, userId);
-            if (resOwnerEmail == false)
-            {
-                NotesCollab notesCollab = new NotesCollab { CollabEmail = userDetails.EmailId, NoteId = noteId };
-                var resCollab = collabRL.AddCollaborator(notesCollab, userId);
-                if (resCollab != null)
-                    return true;
-                else
-                    return false;
-            }
-            else
-                return false;
-        }*/
-
         //Method To Fetch Single Note Details By Giving Note And User Ids
         public GetNotesResponse GetNote(long noteId, long userId)
         {
