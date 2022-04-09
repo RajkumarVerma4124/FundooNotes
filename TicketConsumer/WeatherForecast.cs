@@ -1,6 +1,6 @@
 using System;
 
-namespace FundooNotes
+namespace RestaurentsAPI
 {
     public class WeatherForecast
     {

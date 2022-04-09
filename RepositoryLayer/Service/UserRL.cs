@@ -117,6 +117,33 @@ namespace RepositoryLayer.Service
             }
         }
 
+        //Method To Send Token To The Registered Emailid For The User Who Forgots The Password
+        public UserTicket CreateTicketForPassword(string emailId, string token)
+        {
+            try
+            {
+                var userDetails = fundooContext.UserData.FirstOrDefault(u => u.EmailId == emailId);
+                if (userDetails != null)
+                {
+                    UserTicket ticketResonse = new UserTicket
+                    {
+                        FirstName = userDetails.FirstName,
+                        LastName = userDetails.LastName,
+                        EmailId = emailId,
+                        Token = token,
+                        IssueAt = DateTime.Now
+                    };
+                    return ticketResonse;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         //Method To Reset The Password For Autheniticated EmailId After Token AUthorization 
         public string ResetPassword(ResetPassword resetPassword, string emailId)
         {

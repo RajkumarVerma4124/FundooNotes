@@ -11,6 +11,7 @@ namespace RepositoryLayer.Interface
     /// </summary>
     public interface IUserRL
     {
+        UserTicket CreateTicketForPassword(string emailId, string token);
         bool IsEmailIdExist(string emailId);
         UserEntity Register(UserReg userReg);
         LoginResponse Login(UserLogin userLogin);

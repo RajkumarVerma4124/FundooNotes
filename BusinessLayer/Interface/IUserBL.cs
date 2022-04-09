@@ -11,6 +11,7 @@ namespace BusinessLayer.Interface
     /// </summary>
     public interface IUserBL
     {
+        UserTicket CreateTicketForPassword(string emailId, string token);
         bool IsEmailIdExist(string emailId);
         UserEntity Register(UserReg userReg);
         LoginResponse Login(UserLogin userLogin);
