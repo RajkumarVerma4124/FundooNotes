@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using CommonLayer.Models;
+using FundooNotes.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,13 +22,20 @@ namespace FundooNotes.Controllers
     [Authorize]
     public class LabelsController : ControllerBase
     {
-        //Reference Object For Interface IUserRL
+        /// <summary>
+        /// Reference Object For Interface IUserRL
+        /// </summary>
         private readonly ILabelBL labelBL;
         private readonly IDistributedCache distributedCache;
         private readonly ILogger<LabelsController> logger;
 
 
-        //Created Constructor With Dependency Injection For IUSerRL
+        /// <summary>
+        /// Created Constructor With Dependency Injection For IUSerRL
+        /// </summary>
+        /// <param name="labelBL"></param>
+        /// <param name="distributedCache"></param>
+        /// <param name="logger"></param>
         public LabelsController(ILabelBL labelBL, IDistributedCache distributedCache, ILogger<LabelsController> logger)
         {
             this.labelBL = labelBL;
@@ -35,7 +43,12 @@ namespace FundooNotes.Controllers
             this.logger = logger;
         }
 
-        //Post Request For Creating A New Label (POST: /api/labels/create)
+        /// <summary>
+        /// Post Request For Creating A New Label (POST: /api/labels/create)
+        /// </summary>
+        /// <param name="labelName"></param>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
         [HttpPost("Create")]
         public IActionResult CreateNewLabel(string labelName)
         {
@@ -47,7 +60,7 @@ namespace FundooNotes.Controllers
                 if (ifLabelExist)
                 {
                     logger.LogWarning("The Label Already Exists");
-                    return BadRequest(new { success = false, message = "The Label Already Exists" });
+                    return BadRequest(new { Success = false, message = "The Label Already Exists" });
                 }
                 var labelRes = labelBL.CreateNewLabel(labelName, userId);
                 if (labelRes != null)
@@ -58,17 +71,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Creation Failed");
-                    return BadRequest(new { Success = false, message = "Label Creation Failed" });
+                    throw new AppException("Label Creation Failed");
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
-        //Post Request For Creating A New Label In Notes Its Not Exist (POST: /api/labels/create)
+        /// <summary>
+        /// Post Request For Adding Or Creating A New Label And Add In Notes If Its Not Exist (POST: /api/labels/Addtonote)
+        /// </summary>
+        /// <param name="notesLabel"></param>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
         [HttpPost("AddToNote")]
         public IActionResult AddNoteLabel(NotesLabel notesLabel)
         {
@@ -84,18 +107,30 @@ namespace FundooNotes.Controllers
                 }
                 else
                 {
-                    logger.LogError("Label Creation Failed");
-                    return BadRequest(new { Success = false, message = "Label Creation Failed" });
+                    logger.LogError("Label Added To Note Failed");
+                    throw new AppException("Label Added To Note Failed");
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
-        //Patch Request For Editing The Label For Particular Note (PATCH: /api/labels/Edit)
+        /// <summary>
+        /// Patch Request For Editing The Label For Particular Note (PATCH: /api/labels/Edit)
+        /// </summary>
+        /// <param name="newLableName"></param>
+        /// <param name="labelId"></param>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
+        /// <exception cref="KeyNotFoundException"></exception>
         [HttpPatch("Edit")]
         public IActionResult EditLabel(string newLableName, long labelId)
         {
@@ -104,7 +139,7 @@ namespace FundooNotes.Controllers
                 if (labelId <= 0)
                 {
                     logger.LogWarning("Label Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
+                    throw new AppException("Label Id Should Be Greater Than Zero");
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -116,9 +151,19 @@ namespace FundooNotes.Controllers
                 }
                 else
                 {
-                    logger.LogError("Label Creation Failed");
-                    return BadRequest(new { Success = false, message = "Label Creation Failed" });
+                    logger.LogError("Label Edition Failed");
+                    throw new KeyNotFoundException("Label Edition Failed");
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
             catch (Exception ex)
             {
@@ -127,7 +172,14 @@ namespace FundooNotes.Controllers
             }
         }
 
-        //Delete Request For Removing A Label From Particular Note(Delete: /api/labels/remove)
+        /// <summary>
+        /// Delete Request For Removing A Label From Particular Note(Delete: /api/labels/remove)
+        /// </summary>
+        /// <param name="labelId"></param>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         [HttpDelete("Remove")]
         public IActionResult RemoveLabel(long labelId, long noteId)
         {
@@ -136,7 +188,7 @@ namespace FundooNotes.Controllers
                 if (labelId <= 0)
                 {
                     logger.LogWarning("Label Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
+                    throw new AppException("Label Id Should Be Greater Than Zero");
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -149,16 +201,32 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(labelRes);
-                    return Unauthorized(new { Success = false, message = labelRes });
+                    throw new UnauthorizedAccessException(labelRes);
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new UnauthorizedAccessException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return Unauthorized(new { success = false, message = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Delete Request For Removing A Label From Particular Note(Delete: /api/labels/remove)
+        /// </summary>
+        /// <param name="labelNameId"></param>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
         //Delete Request For Deleting A Label (Delete: /api/labels/delete)
         [HttpDelete("Delete")]
         public IActionResult DeleteLabel(long labelNameId)
@@ -176,17 +244,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(labelRes);
-                    return BadRequest(new { Success = false, message = labelRes });
+                    throw new AppException(labelRes);
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
-        //Get Request For Retrieving List Of Notes Labels (Get: /api/labels/get)
+        /// <summary>
+        /// Get Request For Retrieving List Of Notes Labels (Get: /api/labels/get)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         [HttpGet("GetNotes")]
         public IActionResult GetNoteLabels(long noteId)
         {
@@ -195,7 +273,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -208,17 +286,26 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Label Retreival Failed");
-                    return Unauthorized(new { Success = false, message = "Notes Label Retreival Failed", data = labelRes });
+                    throw new UnauthorizedAccessException("Notes Label Retreival Failed");
                 }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new UnauthorizedAccessException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return Unauthorized(new { success = false, message = ex.Message });
             }
         }
 
-        //Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
+        /// <summary>
+        /// Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
         [HttpGet("GetAll")]
         public IActionResult GetUsersLabelsList()
         {
@@ -235,17 +322,26 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Retreival Failed");
-                    return Unauthorized(new { Success = false, message = "Label Retreival Failed", data = labelRes });
+                    throw new AppException("Label Retreival Failed");
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
-        //Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
+        /// <summary>
+        /// Get Request For Retrieving List Of Labels (Get: /api/labels/getall)
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
         [HttpGet("GetNames")]
         public IActionResult GetUsersLabelNamesList()
         {
@@ -262,16 +358,25 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Names Retreival Failed");
-                    return Unauthorized(new { Success = false, message = "Label Names Retreival Failed", data = labelRes });
+                    throw new AppException("Label Names Retreival Failed");
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Get Request For Retrieving List Of Labels Using Redis(Get: /api/labels/redis)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("redis")]
         public async Task<IActionResult> GetAllLabelUsingRedisCache()
         {

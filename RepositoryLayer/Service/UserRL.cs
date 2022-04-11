@@ -17,12 +17,15 @@ namespace RepositoryLayer.Service
     /// </summary>
     public class UserRL : IUserRL
     {
-        //Reference Object For FundooContext
+        /// <summary>
+        /// Reference Object For FundooContext And IConfiguration
+        /// </summary>
         private readonly FundooContext fundooContext;
-
-        //Reference Object For configuration
         private readonly IConfiguration configuration;
 
+        /// <summary>
+        /// Declare And Intialize A Value For The Secret Key
+        /// </summary>
         private static string Key = "47c53aa7571c33d2f98d02a4313c4ba1ea15e45c18794eb564b21c19591805ff";
 
         //Created Constructor To Initialize Fundoocontext For Each Instance
@@ -32,7 +35,11 @@ namespace RepositoryLayer.Service
             this.configuration = configuration;
         }
 
-        //Method to check if current email id provided by user is exist in db table or not;
+        /// <summary>
+        /// Method to check if current email id provided by user is exist in db table or not
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <returns></returns>
         public bool IsEmailIdExist(string emailId)
         {
             var emailIds = fundooContext.UserData.Where(eu => eu.EmailId == emailId).Count();
@@ -62,7 +69,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method to login user by checking existing db table with user credentials
+        /// <summary>
+        /// Method to login user by checking existing db table with user credentials
+        /// </summary>
+        /// <param name="userLogin"></param>
+        /// <returns></returns>
         public LoginResponse Login(UserLogin userLogin)
         {
             try
@@ -96,7 +107,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Send Token To The Registered Emailid For The User Who Forgots The Password
+        /// <summary>
+        /// Method To Send Token To The Registered Emailid For The User Who Forgots The Password
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <returns></returns>
         public string ForgetPassword(string emailId)
         {
             try
@@ -117,7 +132,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Send Token To The Registered Emailid For The User Who Forgots The Password
+        /// <summary>
+        /// Method To Send Token To The Registered Emailid For The User Who Forgots The Password
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public UserTicket CreateTicketForPassword(string emailId, string token)
         {
             try
@@ -144,7 +164,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Reset The Password For Autheniticated EmailId After Token AUthorization 
+        /// <summary>
+        /// Method To Reset The Password For Autheniticated EmailId After Token AUthorization 
+        /// </summary>
+        /// <param name="resetPassword"></param>
+        /// <param name="emailId"></param>
+        /// <returns></returns>
         public string ResetPassword(ResetPassword resetPassword, string emailId)
         {
             try
@@ -167,7 +192,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Encrypt The Password To Store Into The DB
+        /// <summary>
+        /// Method To Encrypt The Password To Store Into The DB
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public static string PasswordEncrypt(string password)
         {
             try
@@ -187,7 +216,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Decrypt The Password From The DB
+        /// <summary>
+        /// Method To Decrypt The Password From The DB
+        /// </summary>
+        /// <param name="encodedPassword"></param>
+        /// <returns></returns>
         public static string PasswordDecrypt(string encodedPassword)
         {
             try
@@ -209,7 +242,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Generate Security Token For A User
+        /// <summary>
+        /// Method To Generate Security Token For A User
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         private string GenerateSecurityToken(string emailId, long userId)
         {
             try

@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NLog;
 using Microsoft.Extensions.Logging;
+using FundooNotes.Helpers;
 
 namespace FundooNotes.Controllers
 {
@@ -23,12 +24,19 @@ namespace FundooNotes.Controllers
     [Authorize]
     public class CollabController : ControllerBase
     {
-        //Reference Object For Interface IUserRL,IDistributedCache,IMemoryCache,ILogger
+        /// <summary>
+        /// Reference Object For Interface IUserRL,IDistributedCache,IMemoryCache,ILogger
+        /// </summary>
         private readonly ICollabBL collabBL;
         private readonly IDistributedCache distributedCache;
         private readonly ILogger<CollabController> logger;
 
-        //Created Constructor With Dependency Injection For IUSerRL
+        /// <summary>
+        /// Created Constructor With Dependency Injection For IUSerRL
+        /// </summary>
+        /// <param name="collabBL"></param>
+        /// <param name="distributedCache"></param>
+        /// <param name="logger"></param>
         public CollabController(ICollabBL collabBL, IDistributedCache distributedCache, ILogger<CollabController> logger)
         {
             this.collabBL = collabBL;
@@ -36,7 +44,12 @@ namespace FundooNotes.Controllers
             this.logger = logger;
         }
 
-        //Post Request For Creating A New Collaborator (POST: /api/collaborator/add)
+        /// <summary>
+        /// Post Request For Creating A New Collaborator (POST: /api/collaborator/add)
+        /// </summary>
+        /// <param name="notesCollab"></param>
+        /// <returns></returns>
+        /// <exception cref="AppException"></exception>
         [HttpPost("Add")]
         public IActionResult AddCollaborator(NotesCollab notesCollab)
         {
@@ -48,7 +61,7 @@ namespace FundooNotes.Controllers
                 if (ifEmailExist)
                 {
                     logger.LogWarning("The Email Already Exists");
-                    return Ok(new { success = false, message = "The Email Already Exists" });
+                    return BadRequest(new { success = false, message = "The Email Already Exists" });
                 }
                 var collabRes = collabBL.AddCollaborator(notesCollab, userId);
                 if (collabRes != null)
@@ -59,17 +72,28 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Collab Creation Failed");
-                    return BadRequest(new { Success = false, message = "Collab Creation Failed" });
+                    throw new AppException("Collab Creation Failed");
                 }
+            }
+            catch (AppException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new AppException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
-        //Delete Request For Deleting A Collaborator (Delete: /api/collaborator/delete)
+        /// <summary>
+        /// Delete Request For Deleting A Collaborator (Delete: /api/collaborator/delete)
+        /// </summary>
+        /// <param name="collabId"></param>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         [HttpDelete("Delete")]
         public IActionResult DeleteCollaborator(long collabId, long noteId)
         {
@@ -80,7 +104,7 @@ namespace FundooNotes.Controllers
                 if (collabId <= 0)
                 {
                     logger.LogWarning("Collab Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Collab Id Should Be Greater Than Zero" });
+                    throw new AppException("Collab Id Should Be Greater Than Zero");
                 }
                 var collabRes = collabBL.DeleteCollaborator(collabId, noteId, userId);
                 if (collabRes.Contains("Deleted"))
@@ -91,17 +115,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(collabRes);
-                    return BadRequest(new { Success = false, message = collabRes });
+                    throw new UnauthorizedAccessException(collabRes);
                 }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new UnauthorizedAccessException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return Unauthorized(new { success = false, message = ex.Message });
             }
         }
 
-        //Get Request For Retrieving List Of Collaborator (Get: /api/collaborator/get)
+        /// <summary>
+        /// Get Request For Retrieving List Of Collaborator (Get: /api/collaborator/get)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         [HttpGet("Get")]
         public IActionResult GetNoteCollaborators(long noteId)
         {
@@ -110,7 +144,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -123,16 +157,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogWarning("You Dont Have Access To Those Notes");
-                    return Unauthorized(new { Success = false, message = "You Dont Have Access To Those Notes", data = collabRes });
+                    throw new UnauthorizedAccessException("You Dont Have Access To Those Notes");
                 }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new UnauthorizedAccessException(ex.Message);
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                return Unauthorized(new { success = false, message = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Get Request For Retrieving List Of Collaborator using redis(Get: /api/collaborator/redis)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         [HttpGet("redis")]
         public async Task<IActionResult> GetAllCollabUsingRedisCache(long noteId)
         {
@@ -154,20 +199,27 @@ namespace FundooNotes.Controllers
                     //Getting The Id Of Authorized User Using Claims Of Jwt
                     long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                     collabsNoteList = collabBL.GetNoteCollaborators(noteId, userId).ToList();
-                    serializedCollabNoteList = JsonConvert.SerializeObject(collabsNoteList);
-                    redisCollabsNoteList = Encoding.UTF8.GetBytes(serializedCollabNoteList);
-                    var options = new DistributedCacheEntryOptions()
-                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(1));
-                    await distributedCache.SetAsync(cacheKey, redisCollabsNoteList, options);
+                    if (collabsNoteList != null)
+                    {
+                        serializedCollabNoteList = JsonConvert.SerializeObject(collabsNoteList);
+                        redisCollabsNoteList = Encoding.UTF8.GetBytes(serializedCollabNoteList);
+                        var options = new DistributedCacheEntryOptions()
+                            .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                            .SetSlidingExpiration(TimeSpan.FromMinutes(1));
+                        await distributedCache.SetAsync(cacheKey, redisCollabsNoteList, options);
+                    }
+                    else
+                    {
+                        throw new UnauthorizedAccessException("You Dont Have Access To Those Notes");
+                    }
                 }
                 logger.LogInformation("Got The Collaboraters Successfully Using Redis");
                 return Ok(collabsNoteList);
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new UnauthorizedAccessException(ex.Message);
             } 
         }
     }

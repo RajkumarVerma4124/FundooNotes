@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using CommonLayer.Models;
+using FundooNotes.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http; 
 using Microsoft.AspNetCore.Mvc;
@@ -23,12 +24,19 @@ namespace FundooNotes.Controllers
     [Authorize]
     public class NotesController : ControllerBase
     {
-        //Object Reference For Interface INotesBL,IDistributedCache,IMemoryCache,ILogger
+        /// <summary>
+        /// Object Reference For Interface INotesBL,IDistributedCache,IMemoryCache,ILogger
+        /// </summary>
         private readonly INotesBL notesBL;
         private readonly IDistributedCache distributedCache;
         private readonly ILogger<NotesController> logger;
 
-        //Constructor To Initialize The Instance Of Interface INotesBL
+        /// <summary>
+        /// Constructor To Initialize The Instance Of Interface INotesBL
+        /// </summary>
+        /// <param name="notesBL"></param>
+        /// <param name="distributedCache"></param>
+        /// <param name="logger"></param>
         public NotesController(INotesBL notesBL, IDistributedCache distributedCache, ILogger<NotesController> logger)
         {
             this.notesBL = notesBL;
@@ -36,7 +44,11 @@ namespace FundooNotes.Controllers
             this.logger = logger;
         }
 
-        //Post Request For Creating A New Notes For Particular User Id (POST: /api/notes/createnote)
+        /// <summary>
+        /// Post Request For Creating A New Notes For Particular User Id (POST: /api/notes/createnote)
+        /// </summary>
+        /// <param name="userNotes"></param>
+        /// <returns></returns>
         [HttpPost("Create")]
         public IActionResult CreateNote([FromForm] UserNotes userNotes)
         {
@@ -53,17 +65,21 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Note Creation Failed");
-                    return BadRequest(new { success = false, message = "Note Creation Failed" });
+                    throw new AppException("Note Creation Failed Due To Improper Values");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(" Exception Thrown ..", ex.Message);
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
             }
         }
 
-        //Get Request For Retreiving A Single Note For Particular User Id (GET: /api/notes/getnote)
+        /// <summary>
+        /// Get Request For Retreiving A Single Note For Particular User Id (GET: /api/notes/getnote)
+        /// </summary>
+        /// <param name="notesId"></param>
+        /// <returns></returns>
         [HttpGet("Get/{notesId}")]
         public IActionResult GetNote(long notesId)
         {
@@ -74,7 +90,7 @@ namespace FundooNotes.Controllers
                 if (notesId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.GetNote(notesId, userId);
                 if (resNote != null)
@@ -85,17 +101,25 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Note With Given Id Not Found");
-                    return BadRequest(new { success = false, message = "Note With Given Id Not Found" });
+                    throw new KeyNotFoundException("Note With Given Id Not Found");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Get Request For Retreiving A Multiple Notes For Particular User Id (GET: /api/notes/getusers)
+        /// <summary>
+        /// Get Request For Retreiving A Multiple Notes For Particular User Id (GET: /api/notes/getusers)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetUsers")]
         public IActionResult GetAllNotesByUserId()
         {
@@ -112,17 +136,20 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Retrieval Failed");
-                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                    throw new AppException("Notes Retrieval Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
             }
         }
 
-        //Get Request For Retreiving ALL Notes In The DB(GET: /api/notes/getall)
+        /// <summary>
+        /// Get Request For Retreiving ALL Notes In The DB(GET: /api/notes/getall)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetAll")]
         public IActionResult GetAllNotes()
         {
@@ -137,17 +164,21 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Retrieval Failed");
-                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                    throw new AppException("Notes Retrieval Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
             }
         }
 
-        //Get Request For Retreiving A Multiple Notes For Particular Labels (GET: /api/notes/getlabels)
+        /// <summary>
+        /// Get Request For Retreiving A Multiple Notes For Particular Labels (GET: /api/notes/getlabels)
+        /// </summary>
+        /// <param name="labelId"></param>
+        /// <returns></returns>
         [HttpGet("GetLabels")]
         public IActionResult GetNotesByLabelId(long labelId)
         {
@@ -164,17 +195,22 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Retrieval Failed");
-                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
+                    throw new AppException("Notes Retrieval Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
             }
         }
 
-        //Put Request For Updating A Particular Notes For Particular User Id (PUT: /api/notes/updatenote)
+        /// <summary>
+        /// Put Request For Updating A Particular Notes For Particular User Id (PUT: /api/notes/updatenote)
+        /// </summary>
+        /// <param name="noteUpdate"></param>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
         [HttpPut("Update")]
         public IActionResult UpdateNote(NoteUpdate noteUpdate, long noteId)
         {
@@ -185,7 +221,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.UpdateNote(noteUpdate, noteId, userId);
                 if (resNote != null)
@@ -196,17 +232,26 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Note With Given Id Not Found For Update");
-                    return BadRequest(new { success = false, message = "Note With Given Id Not Found For Update" });
+                    throw new KeyNotFoundException("Note With Given Id Not Found For Update");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Delete Request For Deleting A Particular Note For Particular User Id (PUT: /api/notes/deletenote)
+        /// <summary>
+        /// Delete Request For Deleting A Particular Note For Particular User Id (PUT: /api/notes/deletenote)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
         [HttpDelete("Delete")]
         public IActionResult DeleteNote(long noteId)
         {
@@ -217,7 +262,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.DeleteNote(noteId, userId);
                 if (!string.IsNullOrEmpty(resNote))
@@ -228,17 +273,26 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(resNote);
-                    return BadRequest(new { success = false, message = resNote });
+                    throw new KeyNotFoundException(resNote);
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Patch Request For Determining Whether A Particular Note Is Archive Or Not For Particular User Id (PATCH: /api/notes/isarachiveornot)
+        /// <summary>
+        /// Patch Request For Determining Whether A Particular Note Is Archive Or Not For Particular User Id (PATCH: /api/notes/isarachiveornot)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
         [HttpPatch("IsArchive")]
         public IActionResult ChangeIsArchieveStatus(long noteId)
         {
@@ -249,7 +303,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.ChangeIsArchieveStatus(noteId, userId);
                 if (resNote != null)
@@ -260,17 +314,26 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Archive Status Changed Failed");
-                    return BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
+                    throw new KeyNotFoundException("Archive Status Changed Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Patch Request For Determining Whether A Particular Note Is Pinned Or Not For Particular User Id (PATCH: /api/notes/ispinnedornot)
+        /// <summary>
+        /// Patch Request For Determining Whether A Particular Note Is Pinned Or Not For Particular User Id (PATCH: /api/notes/ispinnedornot)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
         [HttpPatch("IsPinned")]
         public IActionResult ChangeIsPinnedStatus(long noteId)
         {
@@ -281,7 +344,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.ChangeIsPinnedStatus(noteId, userId);
                 if (resNote != null)
@@ -292,17 +355,26 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Pinned Status Changed Failed");
-                    return NotFound(new { Success = false, message = "Pinned Status Changed Failed" });
+                    throw new KeyNotFoundException("Pinned Status Changed Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Patch Request For Determining Whether A Particular Note Is Trashed Or Not For Particular User Id (PATCH: /api/notes/istrashornot)
+        /// <summary>
+        /// Patch Request For Determining Whether A Particular Note Is Trashed Or Not For Particular User Id (PATCH: /api/notes/istrashornot)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
         [HttpPatch("IsTrash")]
         public IActionResult ChangeIsTrashStatus(long noteId)
         {
@@ -313,7 +385,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.ChangeIsTrashStatus(noteId, userId);
                 if (resNote != null)
@@ -324,17 +396,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Trash Status Changed Failed");
-                    return BadRequest(new { Success = false, message = "Trash Status Changed Failed" });
+                    throw new KeyNotFoundException("Trash Status Changed Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Patch Request For Changing The Color Of A Particular Note Is (PATCH: /api/notes/color)
+        /// <summary>
+        /// Patch Request For Changing The Color Of A Particular Note Is (PATCH: /api/notes/color)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="newColor"></param>
+        /// <returns></returns>
         [HttpPatch("colour")]
         public IActionResult ChangeColour(long noteId, string newColor)
         {
@@ -345,7 +427,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.ChangeColour(noteId, userId, newColor);
                 if (resNote != null)
@@ -356,16 +438,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Change Color Failed As Given Id Note Found");
-                    return BadRequest(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
+                    throw new KeyNotFoundException("Change Color Failed As Given Id Note Found");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
             }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
+            }   
         }
 
+        /// <summary>
+        /// Post Request For Adding Multiple Images Using Notes Id And Used Id (POST: /api/notes/addimage)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="image"></param>
+        /// <returns></returns>
         [HttpPost("AddImages/{noteId}")]
         public IActionResult AddImages(long noteId, ICollection<IFormFile> image)
         {
@@ -376,7 +469,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.AddImages(noteId, userId, image);
                 if (resNote != null)
@@ -387,17 +480,27 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Image Updation Failed");
-                    return BadRequest(new { Success = false, message = "Image Updation Failed" });
+                    throw new KeyNotFoundException("Image Updation Failed");
                 }
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return BadRequest(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
-        //Patch Request For Deleting A Image Using Notes Id And Used Id (PATCH: /api/notes/deleteimage)
+        /// <summary>
+        /// Put Request For Deleting A Image Using Notes Id And Used Id (PUT: /api/notes/deleteimage)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="imageId"></param>
+        /// <returns></returns>
         [HttpPut("DeleteImage")]
         public IActionResult DeleteImage(long noteId, long imageId)
         {
@@ -408,7 +511,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
+                    throw new AppException("Note Id Should Be Greater Than Zero");
                 }
                 var resNote = notesBL.DeleteImage(imageId, noteId, userId);
                 if (resNote != null)
@@ -419,16 +522,25 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(resNote);
-                    return BadRequest(new { Success = false, message = resNote });
+                    throw new KeyNotFoundException(resNote);
                 }
             }
-            catch (Exception ex)
+            catch(AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                return NotFound(new { success = false, message = ex.Message });
+                throw new AppException(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                throw new KeyNotFoundException(ex.Message);
             }
         }
 
+        /// <summary>
+        /// Get Request For Retreiving ALL Notes Using Redis(GET: /api/notes/redis)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("redis")]
         public async Task<IActionResult> GetAllNotesUsingRedisCache()
         {
