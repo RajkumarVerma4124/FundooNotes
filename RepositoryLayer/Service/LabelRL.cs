@@ -14,16 +14,26 @@ namespace RepositoryLayer.Service
     /// </summary>
     public class LabelRL : ILabelRL
     {
-        //Reference Object For FundooContext
+        /// <summary>
+        /// Reference Object For FundooContext
+        /// </summary>
         private readonly FundooContext fundooContext;
 
-        //Created Constructor To Initialize Fundoocontext For Each Instance
+        /// <summary>
+        /// Created Constructor To Initialize Fundoocontext For Each Instance
+        /// </summary>
+        /// <param name="fundooContext"></param>
         public LabelRL(FundooContext fundooContext)
         {
             this.fundooContext = fundooContext;
         }
 
-        //Method to check if current Label Name Exist Or Not;
+        /// <summary>
+        /// Method to check if current Label Name Exist Or Not;
+        /// </summary>
+        /// <param name="labelName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public bool IsLabelExist(string labelName, long userId)
         {
             try
@@ -38,7 +48,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Create New Labels 
+        /// <summary>
+        /// Method To Create New Labels 
+        /// </summary>
+        /// <param name="labelName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public LabelNameEntity CreateNewLabel(string labelName, long userId)
         {
             try
@@ -67,7 +82,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Create New Labels In Notes If It Doesnt Have Any Existing Labels
+        /// <summary>
+        /// Method To Create New Labels In Notes If It Doesnt Have Any Existing Labels
+        /// </summary>
+        /// <param name="notesLabel"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public LabelsEntity AddNoteLabel(NotesLabel notesLabel, long userId)
         {
             try
@@ -114,7 +134,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Labels And Edit The Label Using label Id And UserId
+        /// <summary>
+        /// Method To Fetch The Labels And Edit The Label Using label Id And UserId
+        /// </summary>
+        /// <param name="newLabelName"></param>
+        /// <param name="userId"></param>
+        /// <param name="labelNameId"></param>
+        /// <returns></returns>
         public LabelNameEntity EditLabel(string newLabelName, long userId, long labelNameId)
         {
             try
@@ -138,7 +164,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch And Remove The Labels From Notes Using Label Id And UserId
+        /// <summary>
+        /// Method To Fetch And Remove The Labels From Notes Using Label Id And UserId
+        /// </summary>
+        /// <param name="labelId"></param>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public string RemoveLabel (long labelId, long noteId, long userId)
         {
             try
@@ -162,7 +194,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch And Delete The Labels Using Label Name And UserId
+        /// <summary>
+        /// Method To Fetch And Delete The Labels Using Label Name And UserId
+        /// </summary>
+        /// <param name="labelNameId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public string DeleteLabel(long labelNameId, long userId)
         {
             try
@@ -186,7 +223,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Lables Lists
+        /// <summary>
+        /// Method To Fetch The Lables Lists
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<LabelsResponse> GetNotesLabels(long noteId, long userId)
         {
             try
@@ -225,7 +267,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Users Lables Lists
+        /// <summary>
+        /// Method To Fetch The Users Lables Lists
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<LabelsResponse> GetUsersLabelsList(long userId)
         {
             try
@@ -265,7 +311,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Lables Lists With Notes
+        /// <summary>
+        /// Method To Fetch The Lables Lists With Notes
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<LabelNameEntity> GetUsersLabelNamesList(long userId)
         {
             try

@@ -14,16 +14,27 @@ namespace RepositoryLayer.Service
     /// </summary>
     public class CollabRL: ICollabRL
     {
-        //Reference Object For FundooContext
+        /// <summary>
+        /// Reference Object For FundooContext
+        /// </summary>
         private readonly FundooContext fundooContext;
 
-        //Created Constructor To Initialize Fundoocontext For Each Instance
+        /// <summary>
+        /// Created Constructor To Initialize Fundoocontext For Each Instance
+        /// </summary>
+        /// <param name="fundooContext"></param>
         public CollabRL(FundooContext fundooContext)
         {
             this.fundooContext = fundooContext;
         }
 
-        //Method to check if current email id provided by user is exist in Collab table or not;
+        /// <summary>
+        /// Method to check if current email id provided by user is exist in Collab table or not
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public bool IsEmailIdExist(string emailId, long noteId, long userId)
         {
             try
@@ -42,7 +53,12 @@ namespace RepositoryLayer.Service
             } 
         }
 
-        //Method To Fetch The Notes And Add The Collaborator Using Note Id And UserId
+        /// <summary>
+        /// Method To Fetch The Notes And Add The Collaborator Using Note Id And UserId
+        /// </summary>
+        /// <param name="notesCollab"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId)
         {
             try
@@ -73,7 +89,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch And Delete The Collaborator Using Note Id And UserId
+        /// <summary>
+        /// Method To Fetch And Delete The Collaborator Using Note Id And UserId
+        /// </summary>
+        /// <param name="collabId"></param>
+        /// <param name="notesId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public string DeleteCollaborator(long collabId, long notesId, long userId)
         {
             try
@@ -97,7 +119,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Note Collaborators Lists
+        /// <summary>
+        /// Method To Fetch The Note Collaborators Lists
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<CollabListResponse> GetNoteCollaborators(long noteId, long userId)
         {
             try

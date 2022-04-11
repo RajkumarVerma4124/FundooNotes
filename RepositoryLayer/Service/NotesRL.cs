@@ -17,21 +17,30 @@ namespace RepositoryLayer.Service
     /// </summary>
     public class NotesRL : INotesRL
     {
-        //Reference Object For FundooContext
+        /// <summary>
+        /// Reference Object For FundooContext And IConfiguaration
+        /// </summary>
         private readonly FundooContext fundooContext;
-
-        //Reference Object For configuration
         private readonly IConfiguration configuration;
 
 
-        //Created Constructor To Initialize Fundoocontext For Each Instance
+        /// <summary>
+        /// Created Constructor To Initialize Fundoocontext For Each Instance
+        /// </summary>
+        /// <param name="fundooContext"></param>
+        /// <param name="configuration"></param>
         public NotesRL(FundooContext fundooContext, IConfiguration configuration)
         {
             this.fundooContext = fundooContext;
             this.configuration = configuration;
         }
 
-        //Method To Create Note With New Notes Data And Userid Into The Db Table
+        /// <summary>
+        /// Method To Create Note With New Notes Data And Userid Into The Db Table
+        /// </summary>
+        /// <param name="userNotes"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public NotesResponse CreateNote(UserNotes userNotes, long userId)
         {
             try
@@ -78,7 +87,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch Single Note Details By Giving Note And User Ids
+        /// <summary>
+        /// Method To Fetch Single Note Details By Giving Note And User Ids
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public GetNotesResponse GetNote(long noteId, long userId)
         {
             try
@@ -117,7 +131,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch Multiple Notes Details By User Ids
+        /// <summary>
+        /// Method To Fetch Multiple Notes Details By User Ids
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<GetNotesResponse> GetAllNotesByUserId(long userId)
         {
             try
@@ -170,7 +188,10 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch Multiple Notes Details From DB
+        /// <summary>
+        /// Method To Fetch Multiple Notes Details From DB
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<GetNotesResponse> GetAllNotes()
         {
             try
@@ -210,7 +231,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch Multiple Notes Details From DB Using Label Name
+        /// <summary>
+        /// Method To Fetch Multiple Notes Details From DB Using Label Name
+        /// </summary>
+        /// <param name="labelNameId"></param>
+        /// <returns></returns>
         public IEnumerable<GetNotesResponse> GetNotesByLabelId(long labelNameId)
         {
             try
@@ -260,7 +285,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch And Update Notes Details And SaveChanges In DB
+        /// <summary>
+        /// Method To Fetch And Update Notes Details And SaveChanges In DB
+        /// </summary>
+        /// <param name="noteUpdate"></param>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public NoteEntity UpdateNote(NoteUpdate noteUpdate, long noteId, long userId)
         {
             try
@@ -292,7 +323,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch And Delete Note Using Note Id
+        /// <summary>
+        /// Method To Fetch And Delete Note Using Note Id
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public string DeleteNote(long noteId, long userId)
         {
             try
@@ -314,7 +350,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes Details And Turn IsArchive If True Then False And Vice Versa
+        /// <summary>
+        /// Method To Fetch The Notes Details And Turn IsArchive If True Then False And Vice Versa
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public NoteEntity ChangeIsArchieveStatus(long noteId, long userId)
         {
             try
@@ -343,7 +384,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes Details And Turn IsPinned If True Then False And Vice Versa
+        /// <summary>
+        /// Method To Fetch The Notes Details And Turn IsPinned If True Then False And Vice Versa
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public NoteEntity ChangeIsPinnedStatus(long noteId, long userId)
         {
             try
@@ -372,7 +418,12 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes Details And Turn IsTrash If True Then False And Vice Versa
+        /// <summary>
+        /// Method To Fetch The Notes Details And Turn IsTrash If True Then False And Vice Versa
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public NoteEntity ChangeIsTrashStatus(long noteId, long userId)
         {
             try
@@ -396,7 +447,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes Details And Changed The Color Of The Note
+        /// <summary>
+        /// Method To Fetch The Notes Details And Changed The Color Of The Note
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <param name="newColor"></param>
+        /// <returns></returns>
         public NoteEntity ChangeColour(long noteId, long userId, string newColor)
         {
             try
@@ -422,7 +479,11 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Upload The Image And Resturn ImageUploadResult
+        /// <summary>
+        /// Method To Upload The Image And Resturn ImageUploadResult
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <returns></returns>
         public ImageUploadResult UploadImage(IFormFile imagePath)
         {
             try
@@ -445,7 +506,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes Details And Update The Image In The Image Field Of Notes Using Cloudinary
+        /// <summary>
+        /// Method To Fetch The Notes Details And Update The Image In The Image Field Of Notes Using Cloudinary
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <param name="imagesPath"></param>
+        /// <returns></returns>
         public IEnumerable<ImageEntity> AddImages(long noteId, long userId, ICollection<IFormFile> imagesPath)
         {
             try
@@ -486,7 +553,13 @@ namespace RepositoryLayer.Service
             }
         }
 
-        //Method To Fetch The Notes Details And Delete The Image In The Image Field Of Notes Using UserId
+        /// <summary>
+        /// Method To Fetch The Notes Details And Delete The Image In The Image Field Of Notes Using UserId
+        /// </summary>
+        /// <param name="imageId"></param>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public string DeleteImage(long imageId, long noteId, long userId)
         {
             try

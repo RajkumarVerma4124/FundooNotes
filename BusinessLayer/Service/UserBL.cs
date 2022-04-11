@@ -13,16 +13,25 @@ namespace BusinessLayer.Service
     /// </summary>
     public class UserBL : IUserBL
     {
-        //Reference Object For Interface IUserRL
+        /// <summary>
+        /// Reference Object For Interface IUserRL
+        /// </summary>
         private readonly IUserRL userRL;
 
-        //Created Constructor With Dependency Injection For IUSerRL
+        /// <summary>
+        /// Created Constructor With Dependency Injection For IUSerRL
+        /// </summary>
+        /// <param name="userRL"></param>
         public UserBL(IUserRL userRL)
         {
             this.userRL = userRL;
         }
 
-        //Method To Return Registered User Data
+        /// <summary>
+        /// Method To Return Repo Layer Registered User Data Method
+        /// </summary>
+        /// <param name="userReg"></param>
+        /// <returns></returns>
         public UserEntity Register(UserReg userReg)
         {
             try
@@ -36,7 +45,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Return Login User Data
+        /// <summary>
+        /// Method To Return Rep Layer Login User Data Method
+        /// </summary>
+        /// <param name="userLogin"></param>
+        /// <returns></returns>
         public LoginResponse Login(UserLogin userLogin)
         {
             try
@@ -49,7 +62,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Call And Return Forget Password 
+        /// <summary>
+        /// Method To Call And Return Forget Password Method Of Repo Layers
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <returns></returns>
         public string ForgetPassword(string emailId)
         {
             try
@@ -62,7 +79,12 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Call And Return Reset Password For Authorized User 
+        /// <summary>
+        /// Method To Call And Return Reset Password For Authorized User 
+        /// </summary>
+        /// <param name="resetPassword"></param>
+        /// <param name="emailId"></param>
+        /// <returns></returns>
         public string ResetPassword(ResetPassword resetPassword, string emailId)
         {
             try
@@ -75,7 +97,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Call And Return IsEmailIdExist Result 
+        /// <summary>
+        /// Method To Call And Return IsEmailIdExist Result 
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <returns></returns>
         public bool IsEmailIdExist(string emailId)
         {
             try
@@ -88,6 +114,12 @@ namespace BusinessLayer.Service
             }
         }
 
+        /// <summary>
+        /// Method To Call And Return IsEmailIdExist Result 
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public UserTicket CreateTicketForPassword(string emailId, string token)
         {
             try

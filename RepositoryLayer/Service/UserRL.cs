@@ -46,7 +46,11 @@ namespace RepositoryLayer.Service
             return emailIds > 0;
         }
 
-        //Method to register user with new user data into the db table
+        /// <summary>
+        /// Method to register user with new user data into the db table
+        /// </summary>
+        /// <param name="userReg"></param>
+        /// <returns></returns>
         public UserEntity Register(UserReg userReg)
         {
             try
@@ -61,7 +65,7 @@ namespace RepositoryLayer.Service
                 if (res > 0)
                     return userEntity;
                 else
-                    return null;          
+                    return null; 
             }
             catch (Exception ex)
             {

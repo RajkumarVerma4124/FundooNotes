@@ -13,16 +13,27 @@ namespace BusinessLayer.Service
     /// </summary>
     public class CollabBL : ICollabBL
     {
-        //Reference Object For Interface IUserRL
+        /// <summary>
+        /// Reference Object For Interface IUserRL
+        /// </summary>
         private readonly ICollabRL colabRL;
 
-        //Created Constructor With Dependency Injection For IUSerRL
+        /// <summary>
+        /// Created Constructor With Dependency Injection For IUSerRL
+        /// </summary>
+        /// <param name="colabRL"></param>
         public CollabBL(ICollabRL colabRL)
         {
             this.colabRL = colabRL;
         }
 
-        //Method To Return Repo Layer EmailExist Method
+        /// <summary>
+        /// Method To Return Repo Layer EmailExist Method
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
 
         public bool IsEmailIdExist(string emailId, long noteId, long userId)
         {
@@ -36,7 +47,12 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Return Repo Layer AddCollaborater Method
+        /// <summary>
+        /// Method To Return Repo Layer AddCollaborater Method
+        /// </summary>
+        /// <param name="notesCollab"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId)
         {
             try
@@ -49,7 +65,13 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Return Repo Layer DeleteCollaborater Method
+        /// <summary>
+        /// Method To Return Repo Layer DeleteCollaborater Method
+        /// </summary>
+        /// <param name="collabId"></param>
+        /// <param name="notesId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public string DeleteCollaborator(long collabId, long notesId, long userId)
         {
             try
@@ -62,7 +84,12 @@ namespace BusinessLayer.Service
             }
         }
 
-        //Method To Return Repo Layer GetCollaborater Method
+        /// <summary>
+        /// Method To Return Repo Layer GetCollaborater Method
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<CollabListResponse> GetNoteCollaborators(long noteId, long userId)
         {
             try
