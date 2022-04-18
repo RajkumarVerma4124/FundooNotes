@@ -75,7 +75,18 @@ namespace RepositoryLayer.Service
                     };
                     fundooContext.CollaboratorData.Add(collaboratorEntity);
                     var result = fundooContext.SaveChanges();
-                    if(result > 0)
+                    CollabUserNotesEntity collabUser = new CollabUserNotesEntity()
+                    {
+                        UserId = collaboratorEntity.UserId,
+                        CollabId = collaboratorEntity.CollabId,
+                        IsPinned = false,
+                        IsArchive = false,
+                        Reminder = null,
+                        NoteColor = null
+                    };
+                    fundooContext.CollabUserNotesData.Add(collabUser);
+                    var collabResult = fundooContext.SaveChanges();
+                    if (result > 0)
                         return collaboratorEntity;
                     else
                     return null;
@@ -101,11 +112,12 @@ namespace RepositoryLayer.Service
             try
             {
                 var collabRes = fundooContext.CollaboratorData.FirstOrDefault(c => c.CollabId == collabId && c.NoteId == notesId);
-                if (collabRes != null)
+                //var collabUserNotesRes = fundooContext.CollabUserNotesData.FirstOrDefault(c => c.CollabId == collabId && c.UserId == collabRes.UserId);
+                if (collabRes != null && collabRes != null)
                 {
                     fundooContext.CollaboratorData.Remove(collabRes);
                     var result = fundooContext.SaveChanges();
-                    if (result > 0)
+                    if (result > 0 )
                         return "Collaborater Deleted Succesfully";
                     else
                         return null;

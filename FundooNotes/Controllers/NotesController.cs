@@ -402,12 +402,12 @@ namespace FundooNotes.Controllers
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                throw ex;
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                throw ex;
             }
         }
 

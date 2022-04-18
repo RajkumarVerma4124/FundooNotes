@@ -55,7 +55,7 @@ namespace CommonLayer.Models
                     EnableSsl = true,
                     Credentials = new NetworkCredential("iamrajvermapro@gmail.com", "QwertyKey@123"),
                 };
-                mailMessage.From = new MailAddress("iamrajvermapro@gmail.com");
+                mailMessage.From = new MailAddress("vermar4124@gmail.com");
                 mailMessage.To.Add(new MailAddress(recieverEmailAddr));
                 string mailBody = $"<!DOCTYPE html>" +
                                   $"<html>" +

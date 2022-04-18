@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RepositoryLayer.Context;
 
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(FundooContext))]
-    partial class FundooContextModelSnapshot : ModelSnapshot
+    [Migration("20220414085021_CollabUserNotesData")]
+    partial class CollabUserNotesData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,9 +27,6 @@ namespace RepositoryLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("CollabId")
-                        .HasColumnType("bigint");
 
                     b.Property<bool>("IsArchive")
                         .HasColumnType("bit");
@@ -45,8 +44,6 @@ namespace RepositoryLayer.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CollabId");
 
                     b.HasIndex("UserId");
 
@@ -216,12 +213,6 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("RepositoryLayer.Entity.CollabUserNotesEntity", b =>
                 {
-                    b.HasOne("RepositoryLayer.Entity.CollaboratorEntity", "Collab")
-                        .WithMany()
-                        .HasForeignKey("CollabId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")

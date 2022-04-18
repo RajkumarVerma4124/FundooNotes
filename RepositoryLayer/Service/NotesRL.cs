@@ -45,38 +45,43 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                IEnumerable<ImageEntity> imageList = null;
-                NoteEntity notesEntity = new NoteEntity
+                if (userNotes != null)
                 {
-                    Title = userNotes.Title,
-                    Description = userNotes.Description,
-                    Reminder = userNotes.Reminder,
-                    Color = userNotes.Color,
-                    IsTrash = userNotes.IsTrash,
-                    IsArchive = userNotes.IsArchive,
-                    IsPinned = userNotes.IsPinned,
-                    CreatedAt = DateTime.Now,
-                    ModifiedAt = DateTime.Now,
-                    UserId = userId
-                };
-                //Adding The Data And Saving The Changes In Database
-                fundooContext.NotesData.Add(notesEntity);
-                int res = fundooContext.SaveChanges();
-                //Condition For Adding Multiple Images If Provide While Creating Note
-                if (userNotes.ImagePaths.Count > 0)
-                {
-                    imageList = AddImages(notesEntity.NoteId, userId, userNotes.ImagePaths);
-                }
-                /*//Calling The Method To Add Owner In Collab While Creating Note
-                var resOwnerCollab = AddOwner(notesEntity.NoteId, userId);*/
-                if (res > 0)
-                {
-                    NotesResponse notesResponse = new NotesResponse()
+                    IEnumerable<ImageEntity> imageList = null;
+                    NoteEntity notesEntity = new NoteEntity
                     {
-                        NotesDetails = notesEntity,
-                        ImagesDetails = imageList,
+                        Title = userNotes.Title,
+                        Description = userNotes.Description,
+                        Reminder = userNotes.Reminder,
+                        Color = userNotes.Color,
+                        IsTrash = userNotes.IsTrash,
+                        IsArchive = userNotes.IsArchive,
+                        IsPinned = userNotes.IsPinned,
+                        CreatedAt = DateTime.Now,
+                        ModifiedAt = DateTime.Now,
+                        UserId = userId
                     };
-                    return notesResponse;
+                    //Adding The Data And Saving The Changes In Database
+                    fundooContext.NotesData.Add(notesEntity);
+                    int res = fundooContext.SaveChanges();
+                    //Condition For Adding Multiple Images If Provide While Creating Note
+                    if (userNotes.ImagePaths.Count > 0)
+                    {
+                        imageList = AddImages(notesEntity.NoteId, userId, userNotes.ImagePaths);
+                    }
+                    /*//Calling The Method To Add Owner In Collab While Creating Note
+                    var resOwnerCollab = AddOwner(notesEntity.NoteId, userId);*/
+                    if (res > 0)
+                    {
+                        NotesResponse notesResponse = new NotesResponse()
+                        {
+                            NotesDetails = notesEntity,
+                            ImagesDetails = imageList,
+                        };
+                        return notesResponse;
+                    }
+                    else
+                        return null;
                 }
                 else
                     return null;
@@ -98,24 +103,27 @@ namespace RepositoryLayer.Service
             try
             {
                 NoteEntity resultNote = null;
+                CollabUserNotesEntity collabUserNote = null;
                 var collabRes = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == noteId);
                 if (collabRes != null)
                     resultNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
                 else
                     resultNote = fundooContext.NotesData.Where(n => n.UserId == userId && n.NoteId == noteId).FirstOrDefault();
                 var imageList = fundooContext.ImagesData.Where(n => n.NoteId == noteId).ToList();
-                if (resultNote != null || collabRes != null)
+                if (resultNote != null)
                 {
+                    if(collabRes != null)
+                        collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
                     GetNotesResponse resNote = new GetNotesResponse
                     {
                         NotesId = resultNote.NoteId,
                         Title = resultNote.Title,
                         Description = resultNote.Description,
-                        Color = resultNote.Color,
-                        IsArchive = resultNote.IsArchive,
+                        Color = collabUserNote != null ? collabUserNote.NoteColor : resultNote.Color,
+                        IsArchive = collabUserNote != null ? collabUserNote.IsArchive : resultNote.IsArchive,
                         IsTrash = resultNote.IsTrash,
-                        IsPinned = resultNote.IsPinned,
-                        Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        IsPinned = collabUserNote != null ? collabUserNote.IsPinned : resultNote.IsPinned,
+                        Reminder = collabUserNote != null ? collabUserNote.Reminder.Value.ToString("dd-MM-yyyy hh:mm:ss tt") : resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         ImageList = imageList
@@ -141,6 +149,7 @@ namespace RepositoryLayer.Service
             try
             {
                 IEnumerable<ImageEntity> imageList = null;
+                CollabUserNotesEntity collabUserNote = null;
                 IList<GetNotesResponse> noteList = new List<GetNotesResponse>();
                 List<NoteEntity> resCollabList = new List<NoteEntity>();
                 List<NoteEntity> resNotesList = new List<NoteEntity>();
@@ -161,16 +170,19 @@ namespace RepositoryLayer.Service
                     foreach (var resultNote in resNotesList)
                     {
                         imageList = fundooContext.ImagesData.Where(n => n.NoteId == resultNote.NoteId).ToList();
+                        var collabNote = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == resultNote.NoteId);
+                        if(collabNote != null)
+                            collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabNote.UserId && n.CollabId == collabNote.CollabId);
                         GetNotesResponse note = new GetNotesResponse
                         {
                             NotesId = resultNote.NoteId,
                             Title = resultNote.Title,
                             Description = resultNote.Description,
-                            Color = resultNote.Color,
-                            IsArchive = resultNote.IsArchive,
+                            Color = collabUserNote != null ? collabUserNote.NoteColor : resultNote.Color,
+                            IsArchive = collabUserNote != null ? collabUserNote.IsArchive : resultNote.IsArchive,
                             IsTrash = resultNote.IsTrash,
-                            IsPinned = resultNote.IsPinned,
-                            Reminder = resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            IsPinned = collabUserNote != null ? collabUserNote.IsPinned : resultNote.IsPinned,
+                            Reminder = collabUserNote != null ? collabUserNote.Reminder.Value.ToString("dd-MM-yyyy hh:mm:ss tt") : resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             ImageList = imageList
@@ -306,7 +318,13 @@ namespace RepositoryLayer.Service
                 {
                     resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ?  resNote.Title : noteUpdate.Title;
                     resNote.Description = string.IsNullOrEmpty(noteUpdate.Description) ? resNote.Description : noteUpdate.Description;
-                    resNote.Reminder = noteUpdate.Reminder.CompareTo(resNote.Reminder) == 0 ? resNote.Reminder : noteUpdate.Reminder;
+                    if(collabRes != null)
+                    {
+                        var collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
+                        collabUserNote.Reminder = noteUpdate.Reminder.CompareTo(collabUserNote.Reminder) == 0 ? collabUserNote.Reminder : noteUpdate.Reminder;
+                    }
+                    else
+                        resNote.Reminder = noteUpdate.Reminder.CompareTo(resNote.Reminder) == 0 ? resNote.Reminder : noteUpdate.Reminder;
                     resNote.ModifiedAt = DateTime.Now;
 
                     // Updating And Saving The Changes In The Database For Given NoteId.
@@ -368,10 +386,21 @@ namespace RepositoryLayer.Service
                     resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    if (resNote.IsArchive == false)
-                        resNote.IsArchive = true;
+                    if(collabRes != null)
+                    {
+                        var collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
+                        if (collabUserNote.IsArchive == false)
+                            collabUserNote.IsArchive = true;
+                        else
+                            collabUserNote.IsArchive = false;
+                    }
                     else
-                        resNote.IsArchive = false;
+                    {
+                        if (resNote.IsArchive == false)
+                            resNote.IsArchive = true;
+                        else
+                            resNote.IsArchive = false;
+                    }
                     fundooContext.SaveChanges();
                     return resNote;
                 }
@@ -402,10 +431,21 @@ namespace RepositoryLayer.Service
                     resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();  
                 if (resNote != null)
                 {
-                    if (resNote.IsPinned == false)
-                        resNote.IsPinned = true;
+                    if (collabRes != null)
+                    {
+                        var collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
+                        if (collabUserNote.IsPinned == false)
+                            collabUserNote.IsPinned = true;
+                        else
+                            collabUserNote.IsPinned = false;
+                    }
                     else
-                        resNote.IsPinned = false;
+                    {
+                        if (resNote.IsPinned == false)
+                            resNote.IsPinned = true;
+                        else
+                            resNote.IsPinned = false;
+                    }
                     fundooContext.SaveChanges();
                     return resNote;
                 }
@@ -466,7 +506,15 @@ namespace RepositoryLayer.Service
                     resNote = this.fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    resNote.Color = newColor;
+                    if (collabRes != null)
+                    {
+                        var collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
+                        collabUserNote.NoteColor = newColor;
+                    }
+                    else
+                    {
+                        resNote.Color = newColor;
+                    }
                     fundooContext.SaveChanges();
                     return resNote;
                 }

@@ -14,7 +14,5 @@ namespace CommonLayer.Models
         public string LabelName { get; set; }
         public long UserId { get; set; }
         public long NoteId { get; set; }
-
-
     }
 }
