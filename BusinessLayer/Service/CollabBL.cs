@@ -101,5 +101,17 @@ namespace BusinessLayer.Service
                 throw ex;
             }
         }
+
+        public IEnumerable<CollabListResponse> GetAllNotesCollaborators()
+        {
+            try
+            {
+                return colabRL.GetAllNotesCollaborators();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

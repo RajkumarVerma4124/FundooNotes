@@ -12,7 +12,7 @@ namespace RepositoryLayer.Interface
     /// </summary>
     public interface INotesRL
     {
-        NotesResponse CreateNote(UserNotes userNotes, long userId);
+        GetNotesResponse CreateNote(UserNotes userNotes, long userId);
         GetNotesResponse GetNote(long noteId, long userId);
         IEnumerable<GetNotesResponse> GetAllNotesByUserId(long userId);
         IEnumerable<GetNotesResponse> GetAllNotes();

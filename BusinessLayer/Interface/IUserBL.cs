@@ -15,7 +15,7 @@ namespace BusinessLayer.Interface
         bool IsEmailIdExist(string emailId);
         UserEntity Register(UserReg userReg);
         LoginResponse Login(UserLogin userLogin);
-        string ForgetPassword(string emailId);
+        string ForgetPassword(GetForgotPassword getForgotPassword);
         string ResetPassword(ResetPassword resetPassword, string emailId);
     }
 }

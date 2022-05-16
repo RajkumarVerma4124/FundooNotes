@@ -17,7 +17,7 @@ namespace CommonLayer.Models
         public string Description { get; set; }
         public string Color { get; set; }
         public ICollection<IFormFile> ImagePaths { get; set; }
-        [DefaultValue("2022-04-01 12:12:55.389Z")]
+        [DefaultValue("2022-05-20 12:12:55.389Z")]
         public DateTime Reminder { get; set; }
         public bool IsArchive { get; set; }
         public bool IsPinned { get; set; }

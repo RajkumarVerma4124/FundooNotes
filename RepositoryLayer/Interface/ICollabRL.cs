@@ -15,5 +15,6 @@ namespace RepositoryLayer.Interface
         CollaboratorEntity AddCollaborator(NotesCollab notesCollab, long userId);
         string DeleteCollaborator(long collabId, long notesId, long userId);
         IEnumerable<CollabListResponse> GetNoteCollaborators(long noteId, long userId);
+        IEnumerable<CollabListResponse> GetAllNotesCollaborators();
     }
 }

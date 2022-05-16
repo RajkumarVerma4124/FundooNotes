@@ -71,15 +71,10 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Creation Failed");
-                    throw new AppException("Label Creation Failed");
+                    return BadRequest(new { Success = false, message = "Label Creation Failed" });
                 }
             }
             catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
                 return BadRequest(new { success = false, message = ex.Message });
@@ -108,13 +103,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Added To Note Failed");
-                    throw new AppException("Label Added To Note Failed");
+                    return BadRequest(new { Success = false, message = "Label Creation Failed" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -139,7 +134,7 @@ namespace FundooNotes.Controllers
                 if (labelId <= 0)
                 {
                     logger.LogWarning("Label Id Should Be Greater Than Zero");
-                    throw new AppException("Label Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -152,18 +147,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Edition Failed");
-                    throw new KeyNotFoundException("Label Edition Failed");
+                    return BadRequest(new { Success = false, message = "Label Edition Failed" });
                 }
-            }
-            catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -188,7 +178,7 @@ namespace FundooNotes.Controllers
                 if (labelId <= 0)
                 {
                     logger.LogWarning("Label Id Should Be Greater Than Zero");
-                    throw new AppException("Label Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Label Id Should Be Greater Than Zero" });
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -201,18 +191,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(labelRes);
-                    throw new UnauthorizedAccessException(labelRes);
+                    return Unauthorized(new { Success = false, message = labelRes });
                 }
-            }
-            catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
             }
             catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new UnauthorizedAccessException(ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -244,15 +229,10 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(labelRes);
-                    throw new AppException(labelRes);
+                    return BadRequest(new { Success = false, message = labelRes });
                 }
             }
             catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
                 return BadRequest(new { success = false, message = ex.Message });
@@ -273,7 +253,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -286,13 +266,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Label Retreival Failed");
-                    throw new UnauthorizedAccessException("Notes Label Retreival Failed");
+                    return Unauthorized(new { Success = false, message = "Notes Label Retreival Failed", data = labelRes });
                 }
             }
             catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new UnauthorizedAccessException(ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -322,13 +302,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Retreival Failed");
-                    throw new AppException("Label Retreival Failed");
+                    return Unauthorized(new { Success = false, message = "Label Retreival Failed", data = labelRes });
                 }
             }
-            catch (AppException ex)
+            catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -358,13 +338,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Label Names Retreival Failed");
-                    throw new AppException("Label Names Retreival Failed");
+                    return Unauthorized(new { Success = false, message = "Label Names Retreival Failed", data = labelRes });
                 }
             }
-            catch (AppException ex)
+            catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {

@@ -38,16 +38,16 @@ namespace FundooNotes.Controllers
         /// <param name="emailId"></param>
         /// <returns></returns>
         [HttpPost("ForgotPassword")]
-        public async Task<IActionResult> CreateTicketForPassword(string emailId)
+        public async Task<IActionResult> CreateTicketForPassword(GetForgotPassword getForgotPassword)
         {
             try
             {
-                if (emailId != null)
+                if (getForgotPassword.EmailId != null)
                 {
-                    var token = userBL.ForgetPassword(emailId);
+                    var token = userBL.ForgetPassword(getForgotPassword);
                     if (!string.IsNullOrEmpty(token))
                     {
-                        var ticketResonse = userBL.CreateTicketForPassword(emailId, token);
+                        var ticketResonse = userBL.CreateTicketForPassword(getForgotPassword.EmailId, token);
                         Uri uri = new Uri("rabbitmq://localhost/ticketQueue");
                         var endPoint = await _bus.GetSendEndpoint(uri);
                         await endPoint.Send(ticketResonse);
@@ -55,21 +55,17 @@ namespace FundooNotes.Controllers
                     }
                     else
                     {
-                        throw new KeyNotFoundException("Email Id Is Not Registered");
+                        return BadRequest(new { success = false, message = "Email Id Is Not Registered" });
                     }
                 }
                 else
                 {
-                    throw new AppException("Something Went Wrong");
+                    return BadRequest(new { success = false, message = "Something Went Wrong" });
                 }
             }
-            catch (KeyNotFoundException ex)
+            catch (Exception ex)
             {
-                throw new KeyNotFoundException(ex.Message);
-            }
-            catch (AppException ex)
-            {
-                throw new AppException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
     }

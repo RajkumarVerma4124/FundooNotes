@@ -2,7 +2,7 @@
 using CommonLayer.Models;
 using FundooNotes.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,13 +66,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Note Creation Failed");
-                    throw new AppException("Note Creation Failed Due To Improper Values");
+                    return BadRequest(new { success = false, message = "Note Creation Failed Due To Improper Values" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(" Exception Thrown ..", ex.Message);
-                throw new AppException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -90,7 +91,7 @@ namespace FundooNotes.Controllers
                 if (notesId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.GetNote(notesId, userId);
                 if (resNote != null)
@@ -101,18 +102,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Note With Given Id Not Found");
-                    throw new KeyNotFoundException("Note With Given Id Not Found");
+                    return NotFound(new { success = false, message = "Note With Given Id Not Found" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -136,13 +132,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Retrieval Failed");
-                    throw new AppException("Notes Retrieval Failed");
+                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -164,13 +160,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Retrieval Failed");
-                    throw new AppException("Notes Retrieval Failed");
+                    return BadRequest(new { success = false, message = "Notes Retrieval Failed" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
 
@@ -195,13 +191,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Notes Retrieval Failed");
-                    throw new AppException("Notes Retrieval Failed");
+                    return NotFound(new { success = false, message = "Notes Retrieval Failed" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -221,7 +217,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.UpdateNote(noteUpdate, noteId, userId);
                 if (resNote != null)
@@ -232,18 +228,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Note With Given Id Not Found For Update");
-                    throw new KeyNotFoundException("Note With Given Id Not Found For Update");
+                    return NotFound(new { success = false, message = "Note With Given Id Not Found For Update" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -262,7 +253,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.DeleteNote(noteId, userId);
                 if (!string.IsNullOrEmpty(resNote))
@@ -273,18 +264,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(resNote);
-                    throw new KeyNotFoundException(resNote);
+                    return NotFound(new { success = false, message = resNote });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -303,7 +289,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.ChangeIsArchieveStatus(noteId, userId);
                 if (resNote != null)
@@ -314,18 +300,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Archive Status Changed Failed");
-                    throw new KeyNotFoundException("Archive Status Changed Failed");
+                    return BadRequest(new { Success = false, message = "Archive Status Changed Failed" });
                 }
-            }
-            catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
 
@@ -344,7 +325,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.ChangeIsPinnedStatus(noteId, userId);
                 if (resNote != null)
@@ -355,18 +336,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Pinned Status Changed Failed");
-                    throw new KeyNotFoundException("Pinned Status Changed Failed");
+                    return NotFound(new { Success = false, message = "Pinned Status Changed Failed" });
                 }
-            }
-            catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
 
@@ -385,7 +361,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.ChangeIsTrashStatus(noteId, userId);
                 if (resNote != null)
@@ -395,19 +371,14 @@ namespace FundooNotes.Controllers
                 }
                 else
                 {
-                    logger.LogError("Trash Status Changed Failed");
-                    throw new KeyNotFoundException("Trash Status Changed Failed");
+                    logger.LogError("You Dont Have Permission To Delete This Note");
+                    return BadRequest(new { Success = false, message = "You Dont Have Permission To Delete This Note" });
                 }
-            }
-            catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw ex;
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw ex;
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
 
@@ -418,18 +389,18 @@ namespace FundooNotes.Controllers
         /// <param name="newColor"></param>
         /// <returns></returns>
         [HttpPatch("colour")]
-        public IActionResult ChangeColour(long noteId, string newColor)
+        public IActionResult ChangeColour(GetNoteColor noteColor)
         {
             try
             {
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                if (noteId <= 0)
+                if (noteColor.NoteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
-                var resNote = notesBL.ChangeColour(noteId, userId, newColor);
+                var resNote = notesBL.ChangeColour(noteColor.NoteId, userId, noteColor.NewColor);
                 if (resNote != null)
                 {
                     logger.LogInformation("Note Colour Changed Successfully");
@@ -438,19 +409,14 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Change Color Failed As Given Id Note Found");
-                    throw new KeyNotFoundException("Change Color Failed As Given Id Note Found");
+                    return BadRequest(new { Success = false, message = "Change Color Failed As Given Id Note Found" });
                 }
-            }
-            catch (AppException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
-            }   
+                return NotFound(new { success = false, message = ex.Message });
+            }
         }
 
         /// <summary>
@@ -469,7 +435,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.AddImages(noteId, userId, image);
                 if (resNote != null)
@@ -480,18 +446,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Image Updation Failed");
-                    throw new KeyNotFoundException("Image Updation Failed");
+                    return BadRequest(new { Success = false, message = "Image Updation Failed" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -511,7 +472,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 var resNote = notesBL.DeleteImage(imageId, noteId, userId);
                 if (resNote != null)
@@ -522,18 +483,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(resNote);
-                    throw new KeyNotFoundException(resNote);
+                    return BadRequest(new { Success = false, message = resNote });
                 }
             }
-            catch(AppException ex)
+            catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 

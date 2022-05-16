@@ -116,11 +116,11 @@ namespace RepositoryLayer.Service
         /// </summary>
         /// <param name="emailId"></param>
         /// <returns></returns>
-        public string ForgetPassword(string emailId)
+        public string ForgetPassword(GetForgotPassword getForgotPassword)
         {
             try
             {
-                var userDetails = fundooContext.UserData.Where(u => u.EmailId == emailId).FirstOrDefault();
+                var userDetails = fundooContext.UserData.Where(u => u.EmailId == getForgotPassword.EmailId).FirstOrDefault();
                 if (userDetails != null)
                 {
                     var token = GenerateSecurityToken(userDetails.EmailId, userDetails.UserId);
@@ -272,7 +272,7 @@ namespace RepositoryLayer.Service
                   signingCredentials: credentials
                 );
                 return new JwtSecurityTokenHandler().WriteToken(token);
-            }
+            } 
             catch (Exception ex)
             {
                 throw ex;

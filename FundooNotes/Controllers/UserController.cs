@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using FundooNotes.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FundooNotes.Controllers
 {
@@ -61,13 +62,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Registeration Unsuccessfull");
-                    throw new AppException("Something Went Wrong");
+                    return BadRequest(new { success = false, message = "Something Went Wrong" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException("Something Went Wrong");
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
 
@@ -86,20 +87,21 @@ namespace FundooNotes.Controllers
                 if (resUser != null)
                 {
                     logger.LogInformation("Login Successfull");
-                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.UserData.EmailId, token = resUser.Token });
+                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.UserData.EmailId, FirstName = resUser.UserData.FirstName, LastName = resUser.UserData.LastName, token = resUser.Token });
                 }
                 else
                 {
                     logger.LogError("Login Failed");
-                    throw new AppException("Email Or Password Is Incorrect");
+                    return BadRequest(new { success = false, message = "Login Failed Check EmailId And Password" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
+
 
         /// <summary>
         /// Post Request For Forgot Password Existing User (POST: /api/user/forgotpassword)
@@ -108,11 +110,11 @@ namespace FundooNotes.Controllers
         /// <returns></returns>
         /// <exception cref="KeyNotFoundException"></exception>
         [HttpPost("ForgotPassword")]
-        public IActionResult ForgotPassword(string emailId)
+        public IActionResult ForgotPassword(GetForgotPassword getForgotPassword)
         {
             try
             {
-                var resUser = userBL.ForgetPassword(emailId);
+                var resUser = userBL.ForgetPassword(getForgotPassword);
                 if (resUser != null)
                 {
                     logger.LogInformation("Reset Link Sent Successfull");
@@ -121,13 +123,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Entered Email Id Isn't Registered");
-                    throw new KeyNotFoundException("Entered Email Id Not Found");
+                    return BadRequest(new { success = false, message = "Entered Email Id Isn't Registered" });
                 }
             }
             catch (KeyNotFoundException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new KeyNotFoundException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
 
@@ -154,13 +156,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(resMessage);
-                    throw new AppException(resMessage);
+                    return BadRequest(new { success = false, message = resMessage });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
     }

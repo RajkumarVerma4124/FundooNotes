@@ -31,7 +31,9 @@ namespace RepositoryLayer.Entity
         public bool IsPinned { get; set; }
         [DefaultValue("false")]
         public bool IsArchive { get; set; }
+        [DefaultValue("white")]
         public string NoteColor { get; set; }
+        [DefaultValue("2022-05-20 12:12:55.389Z")]
         public DateTime? Reminder { get; set; }
     }
 }

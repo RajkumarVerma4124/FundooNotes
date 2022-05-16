@@ -34,7 +34,7 @@ namespace BusinessLayer.Service
         /// <param name="userNotes"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public NotesResponse CreateNote(UserNotes userNotes, long userId)
+        public GetNotesResponse CreateNote(UserNotes userNotes, long userId)
         {
             try
             {

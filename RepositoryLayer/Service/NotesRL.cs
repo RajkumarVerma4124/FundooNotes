@@ -2,6 +2,7 @@
 using CloudinaryDotNet.Actions;
 using CommonLayer.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
@@ -41,7 +42,7 @@ namespace RepositoryLayer.Service
         /// <param name="userNotes"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public NotesResponse CreateNote(UserNotes userNotes, long userId)
+        public GetNotesResponse CreateNote(UserNotes userNotes, long userId)
         {
             try
             {
@@ -65,7 +66,7 @@ namespace RepositoryLayer.Service
                     fundooContext.NotesData.Add(notesEntity);
                     int res = fundooContext.SaveChanges();
                     //Condition For Adding Multiple Images If Provide While Creating Note
-                    if (userNotes.ImagePaths.Count > 0)
+                    if (userNotes.ImagePaths != null)
                     {
                         imageList = AddImages(notesEntity.NoteId, userId, userNotes.ImagePaths);
                     }
@@ -73,10 +74,19 @@ namespace RepositoryLayer.Service
                     var resOwnerCollab = AddOwner(notesEntity.NoteId, userId);*/
                     if (res > 0)
                     {
-                        NotesResponse notesResponse = new NotesResponse()
+                        GetNotesResponse notesResponse = new GetNotesResponse()
                         {
-                            NotesDetails = notesEntity,
-                            ImagesDetails = imageList,
+                            NotesId = notesEntity.NoteId,
+                            Title = notesEntity.Title,
+                            Description = notesEntity.Description,
+                            Color = notesEntity.Color,
+                            ImageList = imageList,
+                            Reminder = notesEntity.Reminder,
+                            IsArchive = notesEntity.IsArchive,
+                            IsPinned = notesEntity.IsPinned,
+                            IsTrash = notesEntity.IsTrash,
+                            CreatedAt = notesEntity.CreatedAt,
+                            ModifiedAt = notesEntity.ModifiedAt
                         };
                         return notesResponse;
                     }
@@ -112,18 +122,18 @@ namespace RepositoryLayer.Service
                 var imageList = fundooContext.ImagesData.Where(n => n.NoteId == noteId).ToList();
                 if (resultNote != null)
                 {
-                    if(collabRes != null)
+                    if (collabRes != null)
                         collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
                     GetNotesResponse resNote = new GetNotesResponse
                     {
                         NotesId = resultNote.NoteId,
                         Title = resultNote.Title,
                         Description = resultNote.Description,
-                        Color = collabUserNote != null ? collabUserNote.NoteColor : resultNote.Color,
+                        Color = collabUserNote != null ? collabUserNote?.NoteColor : resultNote.Color,
                         IsArchive = collabUserNote != null ? collabUserNote.IsArchive : resultNote.IsArchive,
                         IsTrash = resultNote.IsTrash,
                         IsPinned = collabUserNote != null ? collabUserNote.IsPinned : resultNote.IsPinned,
-                        Reminder = collabUserNote != null ? collabUserNote.Reminder.Value.ToString("dd-MM-yyyy hh:mm:ss tt") : resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                        Reminder = collabUserNote != null ? collabUserNote?.Reminder.Value.ToString("dd-MM-yyyy hh:mm:ss tt") : resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                         ImageList = imageList
@@ -165,35 +175,35 @@ namespace RepositoryLayer.Service
                             resNotesList.Add(noteRes);
                     }
                 }
-                if (resNotesList.Count() > 0) 
-                { 
+                if (resNotesList.Count() > 0)
+                {
                     foreach (var resultNote in resNotesList)
                     {
                         imageList = fundooContext.ImagesData.Where(n => n.NoteId == resultNote.NoteId).ToList();
                         var collabNote = fundooContext.CollaboratorData.FirstOrDefault(n => n.UserId == userId && n.NoteId == resultNote.NoteId);
-                        if(collabNote != null)
+                        if (collabNote != null)
                             collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabNote.UserId && n.CollabId == collabNote.CollabId);
                         GetNotesResponse note = new GetNotesResponse
                         {
                             NotesId = resultNote.NoteId,
                             Title = resultNote.Title,
                             Description = resultNote.Description,
-                            Color = collabUserNote != null ? collabUserNote.NoteColor : resultNote.Color,
+                            Color = collabUserNote != null ? collabUserNote?.NoteColor : resultNote.Color,
                             IsArchive = collabUserNote != null ? collabUserNote.IsArchive : resultNote.IsArchive,
                             IsTrash = resultNote.IsTrash,
                             IsPinned = collabUserNote != null ? collabUserNote.IsPinned : resultNote.IsPinned,
-                            Reminder = collabUserNote != null ? collabUserNote.Reminder.Value.ToString("dd-MM-yyyy hh:mm:ss tt") : resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                            Reminder = collabUserNote != null ? collabUserNote?.Reminder.Value.ToString("dd-MM-yyyy hh:mm:ss tt") : resultNote.Reminder.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             CreatedAt = resultNote.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             ModifiedAt = resultNote.ModifiedAt.ToString("dd-MM-yyyy hh:mm:ss tt"),
                             ImageList = imageList
                         };
                         noteList.Add(note);
                     }
-                    return noteList; 
+                    return noteList.OrderBy(x => x.IsPinned).ThenBy(y => y.ModifiedAt);
                 }
                 else
                     return null;
-            }    
+            }
             catch (Exception ex)
             {
                 throw ex;
@@ -316,9 +326,9 @@ namespace RepositoryLayer.Service
                     resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ?  resNote.Title : noteUpdate.Title;
+                    resNote.Title = string.IsNullOrEmpty(noteUpdate.Title) ? resNote.Title : noteUpdate.Title;
                     resNote.Description = string.IsNullOrEmpty(noteUpdate.Description) ? resNote.Description : noteUpdate.Description;
-                    if(collabRes != null)
+                    if (collabRes != null)
                     {
                         var collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
                         collabUserNote.Reminder = noteUpdate.Reminder.CompareTo(collabUserNote.Reminder) == 0 ? collabUserNote.Reminder : noteUpdate.Reminder;
@@ -354,6 +364,16 @@ namespace RepositoryLayer.Service
                 var resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
+                    var images = fundooContext.ImagesData.Where(x => x.NoteId == resNote.NoteId).ToList();
+                    var collab = fundooContext.CollaboratorData.Where(x => x.NoteId == noteId).ToList();
+                    if (images.Count() > 0)
+                    {
+                        fundooContext.ImagesData.RemoveRange(images);
+                    }
+                    if(collab.Count() > 0)
+                    {
+                        fundooContext.CollaboratorData.RemoveRange(collab);
+                    }
                     // Deleting And Saving The Changes In The Database For Given NoteId.
                     fundooContext.NotesData.Remove(resNote);
                     fundooContext.SaveChanges();
@@ -386,7 +406,7 @@ namespace RepositoryLayer.Service
                     resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
-                    if(collabRes != null)
+                    if (collabRes != null)
                     {
                         var collabUserNote = fundooContext.CollabUserNotesData.FirstOrDefault(n => n.UserId == collabRes.UserId && n.CollabId == collabRes.CollabId);
                         if (collabUserNote.IsArchive == false)
@@ -428,7 +448,7 @@ namespace RepositoryLayer.Service
                 if (collabRes != null)
                     resNote = fundooContext.NotesData.Where(n => n.NoteId == collabRes.NoteId).FirstOrDefault();
                 else
-                    resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();  
+                    resNote = fundooContext.NotesData.Where(n => n.NoteId == noteId && n.UserId == userId).FirstOrDefault();
                 if (resNote != null)
                 {
                     if (collabRes != null)
@@ -450,7 +470,7 @@ namespace RepositoryLayer.Service
                     return resNote;
                 }
                 else
-                    return null;   
+                    return null;
             }
             catch (Exception ex)
             {
@@ -479,7 +499,7 @@ namespace RepositoryLayer.Service
                     return resNote;
                 }
                 else
-                    return null;    
+                    return null;
             }
             catch (Exception ex)
             {
@@ -537,7 +557,7 @@ namespace RepositoryLayer.Service
             try
             {
                 Account account = new Account(configuration["Cloudinary:CloudName"], configuration["Cloudinary:ApiKey"], configuration["Cloudinary:ApiSecret"]);
-                Cloudinary cloud = new Cloudinary(account);    
+                Cloudinary cloud = new Cloudinary(account);
                 var uploadParams = new ImageUploadParams()
                 {
                     File = new FileDescription(imagePath.FileName, imagePath.OpenReadStream()),

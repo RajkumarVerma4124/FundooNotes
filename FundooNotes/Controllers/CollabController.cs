@@ -72,13 +72,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError("Collab Creation Failed");
-                    throw new AppException("Collab Creation Failed");
+                    return BadRequest(new { Success = false, message = "The Email Doesn't Exists" });
                 }
             }
             catch (AppException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new AppException(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace FundooNotes.Controllers
                 if (collabId <= 0)
                 {
                     logger.LogWarning("Collab Id Should Be Greater Than Zero");
-                    throw new AppException("Collab Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Collab Id Should Be Greater Than Zero" });
                 }
                 var collabRes = collabBL.DeleteCollaborator(collabId, noteId, userId);
                 if (collabRes.Contains("Deleted"))
@@ -115,13 +115,13 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogError(collabRes);
-                    throw new UnauthorizedAccessException(collabRes);
+                    return Unauthorized(new { Success = false, message = collabRes });
                 }
             }
             catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new UnauthorizedAccessException(ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -144,7 +144,7 @@ namespace FundooNotes.Controllers
                 if (noteId <= 0)
                 {
                     logger.LogWarning("Note Id Should Be Greater Than Zero");
-                    throw new AppException("Note Id Should Be Greater Than Zero");
+                    return BadRequest(new { success = false, message = "Note Id Should Be Greater Than Zero" });
                 }
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
@@ -157,18 +157,49 @@ namespace FundooNotes.Controllers
                 else
                 {
                     logger.LogWarning("You Dont Have Access To Those Notes");
-                    throw new UnauthorizedAccessException("You Dont Have Access To Those Notes");
+                    return Unauthorized(new { Success = false, message = "You Dont Have Access To Those Notes", data = collabRes });
                 }
             }
             catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new UnauthorizedAccessException(ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
                 return Unauthorized(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get Request For Retrieving List Of Collabors (Get: /api/collaborator/get)
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        [HttpGet("GetAll")]
+        public IActionResult GetAllNoteCollabUsers()
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                long userId = Convert.ToInt64(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var collabRes = collabBL.GetAllNotesCollaborators();
+                if (collabRes != null)
+                {
+                    logger.LogInformation("Got The Collaboraters Successfully");
+                    return Ok(new { Success = true, message = "Got All The Collaboraters Successfully", data = collabRes });
+                }
+                else
+                {
+                    logger.LogWarning("No Collab Notes Present");
+                    return NotFound(new { Success = false, message = "No Collab Notes Present", data = collabRes });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -210,7 +241,7 @@ namespace FundooNotes.Controllers
                     }
                     else
                     {
-                        throw new UnauthorizedAccessException("You Dont Have Access To Those Notes");
+                        return Unauthorized(new { success = false, message = "You Dont Have Access To Those Notes" });
                     }
                 }
                 logger.LogInformation("Got The Collaboraters Successfully Using Redis");
@@ -219,8 +250,8 @@ namespace FundooNotes.Controllers
             catch (UnauthorizedAccessException ex)
             {
                 logger.LogCritical(ex, " Exception Thrown...");
-                throw new UnauthorizedAccessException(ex.Message);
-            } 
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
         }
     }
 }

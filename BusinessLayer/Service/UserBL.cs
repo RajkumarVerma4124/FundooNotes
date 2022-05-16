@@ -67,11 +67,11 @@ namespace BusinessLayer.Service
         /// </summary>
         /// <param name="emailId"></param>
         /// <returns></returns>
-        public string ForgetPassword(string emailId)
+        public string ForgetPassword(GetForgotPassword getForgotPassword)
         {
             try
             {
-                return this.userRL.ForgetPassword(emailId);
+                return this.userRL.ForgetPassword(getForgotPassword);
             }
             catch (Exception ex)
             {

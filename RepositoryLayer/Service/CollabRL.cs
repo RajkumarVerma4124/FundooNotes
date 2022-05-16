@@ -81,8 +81,8 @@ namespace RepositoryLayer.Service
                         CollabId = collaboratorEntity.CollabId,
                         IsPinned = false,
                         IsArchive = false,
-                        Reminder = null,
-                        NoteColor = null
+                        Reminder = DateTime.Now.AddDays(30),
+                        NoteColor = "#ffffff"
                     };
                     fundooContext.CollabUserNotesData.Add(collabUser);
                     var collabResult = fundooContext.SaveChanges();
@@ -151,8 +151,8 @@ namespace RepositoryLayer.Service
                     //Condition For Adding CollabOwner
                     CollabListResponse collabOwner = new CollabListResponse()
                     {
-                        FirstName = ownerCollabDetails.UserId == userId ? ownerCollabDetails.FirstName : null,
-                        LastName = ownerCollabDetails.UserId == userId ? ownerCollabDetails.LastName : null,
+                        FirstName = ownerCollabDetails.FirstName,
+                        LastName = ownerCollabDetails.LastName,
                         CollabId = null,
                         CollabEmail = ownerCollabDetails.EmailId,
                         UserId = userId,
@@ -163,10 +163,11 @@ namespace RepositoryLayer.Service
                     //Condition For Adding CollabsUser
                     foreach (var collab in collabList)
                     {
+                        var collabUser = fundooContext.UserData.FirstOrDefault(o => o.UserId == collab.UserId);
                         CollabListResponse collabUsers = new CollabListResponse()
                         {
-                            FirstName = ownerCollabDetails.UserId != userId && collab.UserId == userId ? userDetails.FirstName : null,
-                            LastName = ownerCollabDetails.UserId != userId && collab.UserId == userId ? userDetails.LastName : null,
+                            FirstName = collabUser.FirstName,
+                            LastName = collabUser.LastName,
                             CollabId = collab.CollabId,
                             CollabEmail = collab.CollabEmail,
                             UserId = collab.UserId,
@@ -184,5 +185,40 @@ namespace RepositoryLayer.Service
                 throw ex;
             }
         }
+
+        public IEnumerable<CollabListResponse> GetAllNotesCollaborators()
+        {
+            try
+            {
+                List<CollabListResponse> collabNotesList = new List<CollabListResponse>();
+                var collabList = fundooContext.CollaboratorData.ToList();
+                if ( collabList.Count() > 0)
+                {
+                    //Condition For Adding CollabsUser
+                    foreach (var collab in collabList)
+                    {
+                        var collabUser = fundooContext.UserData.FirstOrDefault(o => o.UserId == collab.UserId);
+                        CollabListResponse collabUsers = new CollabListResponse()
+                        {
+                            FirstName = collabUser.FirstName,
+                            LastName = collabUser.LastName,
+                            CollabId = collab.CollabId,
+                            CollabEmail = collab.CollabEmail,
+                            UserId = collab.UserId,
+                            NoteId = collab.NoteId,
+                        };
+                        collabNotesList.Add(collabUsers);
+                    }
+                    return collabNotesList;
+                }
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
     }
 }
